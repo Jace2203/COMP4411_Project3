@@ -2,7 +2,13 @@
 
 ## Required
 
-- [ ] 
+- [x] Box Intersection
+- [ ] Phong Specular-Reflection Model
+- [ ] Directional Lights
+- [ ] Point Lights
+- [ ] Shadow Attenuation
+- [ ] Reflection
+- [ ] Refraction
 
 ## TO-DO List
 |BW|Task|Done|
