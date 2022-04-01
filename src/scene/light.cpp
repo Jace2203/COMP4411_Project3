@@ -34,7 +34,11 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 	// You'll need to modify this method to attenuate the intensity 
 	// of the light based on the distance between the source and the 
 	// point P.  For now, I assume no attenuation and just return 1.0
-	return 1.0;
+
+	double d = (position - P).length();
+	double result = 1.0 / (0.3 + 0.1 * d + 0.3 * d * d);
+	
+	return (result > 1.0 ? 1.0 : result);
 }
 
 vec3f PointLight::getColor( const vec3f& P ) const
