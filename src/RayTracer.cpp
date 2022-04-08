@@ -40,7 +40,12 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// rays.
 
 		const Material& m = i.getMaterial();
-		return m.shade(scene, r, i);
+		vec3f P = r.at(i.t);
+
+		if (!depth)
+			return m.shade(scene, r, i);
+		
+		return m.shade(scene, r, i) + prod(m.ks, traceRay(scene, ray(ray::reflect(r.getDirection(), i.N), r.at(i.t)), thresh, depth - 1));
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color

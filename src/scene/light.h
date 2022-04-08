@@ -45,6 +45,10 @@ public:
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
 
+	double a = 0;
+	double b = 0;
+	double c = 0;
+
 protected:
 	vec3f position;
 };

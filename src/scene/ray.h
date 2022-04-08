@@ -32,6 +32,8 @@ public:
 	vec3f getPosition() const { return p; }
 	vec3f getDirection() const { return d; }
 
+    static vec3f reflect(const vec3f &I, const vec3f &N){ return I - 2 * I.dot(N) * N; }
+    
 protected:
 	vec3f p;
 	vec3f d;
