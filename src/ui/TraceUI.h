@@ -61,12 +61,14 @@ public:
 	int			getSize();
 	int			getDepth();
 	int			m_getSupPixel() { return m_nSupPixel; }
+	int			getApertureSize() { return m_nApertureSize; }
 
 	float		getConstant() { return m_fConstant; }
 	float		getLinear() { return m_fLinear; }
 	float		getQuadric() { return m_fQuadric; }
 	float		getAmbient() { return m_fAmbient; }
 	float		getThreshhold() { return m_fThreshhold; }
+	float		getFocalLength() { return m_fFocalLength; }
 
 	bool		getSuperSamp() { return m_bSuperSamp; }
 	bool		getAdaptSupper() { return m_bAdaptSupper; }
@@ -78,9 +80,6 @@ public:
 	bool		getGlossy() { return m_bGlossy; }
 	bool		getSoftShadow() { return m_bSoftShadow; }
 	bool		getMotion() { return m_bMotion; }
-
-	float		getFocalLength() { return m_fFocalLength; }
-	int			getApertureSize() { return m_nApertureSize; }
 
 private:
 	RayTracer*	raytracer;
