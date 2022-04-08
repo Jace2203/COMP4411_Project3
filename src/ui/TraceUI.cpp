@@ -92,6 +92,116 @@ void TraceUI::cb_depthSlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nDepth=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+void TraceUI::cb_constantSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fConstant=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_linearSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fLinear=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_quadricSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fQuadric=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_ambientSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fAmbient=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_threshholdSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fThreshhold=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_superSampButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bSuperSamp)
+		((TraceUI*)(o->user_data()))->m_bSuperSamp = false;
+	else ((TraceUI*)(o->user_data()))->m_bSuperSamp = true;
+}
+
+void TraceUI::cb_adaptSupperButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bAdaptSupper)
+		((TraceUI*)(o->user_data()))->m_bAdaptSupper = false;
+	else ((TraceUI*)(o->user_data()))->m_bAdaptSupper = true;
+}
+
+void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bJitter)
+		((TraceUI*)(o->user_data()))->m_bJitter = false;
+	else ((TraceUI*)(o->user_data()))->m_bJitter = true;
+}
+
+void TraceUI::cb_supPixelSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nSupPixel=int( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_backgroundButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bBackground)
+		((TraceUI*)(o->user_data()))->m_bBackground = false;
+	else ((TraceUI*)(o->user_data()))->m_bBackground = true;
+}
+
+void TraceUI::cb_textureButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bTexture)
+		((TraceUI*)(o->user_data()))->m_bTexture = false;
+	else ((TraceUI*)(o->user_data()))->m_bTexture = true;
+}
+
+void TraceUI::cb_bumpMappingButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bBumpMapping)
+		((TraceUI*)(o->user_data()))->m_bBumpMapping = false;
+	else ((TraceUI*)(o->user_data()))->m_bBumpMapping = true;
+}
+
+void TraceUI::cb_DOFButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bDOF)
+		((TraceUI*)(o->user_data()))->m_bDOF = false;
+	else ((TraceUI*)(o->user_data()))->m_bDOF = true;
+}
+
+void TraceUI::cb_glossyButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bGlossy)
+		((TraceUI*)(o->user_data()))->m_bGlossy = false;
+	else ((TraceUI*)(o->user_data()))->m_bGlossy = true;
+}
+
+void TraceUI::cb_softShadowButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bSoftShadow)
+		((TraceUI*)(o->user_data()))->m_bSoftShadow = false;
+	else ((TraceUI*)(o->user_data()))->m_bSoftShadow = true;
+}
+
+void TraceUI::cb_motionButton(Fl_Widget* o, void* v)
+{
+	if (((TraceUI*)(o->user_data()))->m_bMotion)
+		((TraceUI*)(o->user_data()))->m_bMotion = false;
+	else ((TraceUI*)(o->user_data()))->m_bMotion = true;
+}
+
+void TraceUI::cb_focalLengthSlider(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_fFocalLength=float( ((Fl_Slider *)o)->value() ) ;
+}
+
+void TraceUI::cb_apertureSizeSlider(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nApertureSize=int( ((Fl_Slider *)o)->value() ) ;
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -214,10 +324,35 @@ TraceUI::TraceUI() {
 	// init.
 	m_nDepth = 0;
 	m_nSize = 150;
-	m_mainWindow = new Fl_Window(100, 40, 320, 100, "Ray <Not Loaded>");
+
+	m_fConstant = 0.25;
+	m_fLinear = 0.25;
+	m_fQuadric = 0.5;
+	m_fAmbient = 0.2;
+	m_fThreshhold = 0;
+
+	m_bSuperSamp = false;
+	m_bAdaptSupper = false;
+	m_bJitter = false;
+
+	m_nSupPixel = 2;
+
+	m_bBackground = false;
+	m_bTexture = false;
+	m_bBumpMapping = false;
+
+	m_bDOF = false;
+	m_bGlossy = false;
+	m_bSoftShadow = false;
+	m_bMotion = false;
+
+	m_nApertureSize = 2;
+	m_fFocalLength = 2;
+
+	m_mainWindow = new Fl_Window(100, 40, 350, 480, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
-		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
+		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
 		m_menubar->menu(menuitems);
 
 		// install slider depth
@@ -246,11 +381,168 @@ TraceUI::TraceUI() {
 		m_sizeSlider->align(FL_ALIGN_RIGHT);
 		m_sizeSlider->callback(cb_sizeSlides);
 
-		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
+		// install slider Constant
+		m_constantSlider = new Fl_Value_Slider(10, 80, 180, 20, "Attenuation, Constant");
+		m_constantSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_constantSlider->type(FL_HOR_NICE_SLIDER);
+        m_constantSlider->labelfont(FL_COURIER);
+        m_constantSlider->labelsize(12);
+		m_constantSlider->minimum(0);
+		m_constantSlider->maximum(1);
+		m_constantSlider->step(0.01);
+		m_constantSlider->value(m_fConstant);
+		m_constantSlider->align(FL_ALIGN_RIGHT);
+		m_constantSlider->callback(cb_constantSlides);
+
+		// install slider Linear
+		m_linearSlider = new Fl_Value_Slider(10, 105, 180, 20, "Attenuation, Linear");
+		m_linearSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_linearSlider->type(FL_HOR_NICE_SLIDER);
+        m_linearSlider->labelfont(FL_COURIER);
+        m_linearSlider->labelsize(12);
+		m_linearSlider->minimum(0);
+		m_linearSlider->maximum(1);
+		m_linearSlider->step(0.01);
+		m_linearSlider->value(m_fLinear);
+		m_linearSlider->align(FL_ALIGN_RIGHT);
+		m_linearSlider->callback(cb_linearSlides);
+
+		// install slider Quadric
+		m_quadricSlider = new Fl_Value_Slider(10, 130, 180, 20, "Attenuation, Quadric");
+		m_quadricSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_quadricSlider->type(FL_HOR_NICE_SLIDER);
+        m_quadricSlider->labelfont(FL_COURIER);
+        m_quadricSlider->labelsize(12);
+		m_quadricSlider->minimum(0);
+		m_quadricSlider->maximum(1);
+		m_quadricSlider->step(0.01);
+		m_quadricSlider->value(m_fQuadric);
+		m_quadricSlider->align(FL_ALIGN_RIGHT);
+		m_quadricSlider->callback(cb_quadricSlides);
+
+		// install slider Ambient
+		m_ambientSlider = new Fl_Value_Slider(10, 155, 180, 20, "Ambient Light");
+		m_ambientSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_ambientSlider->type(FL_HOR_NICE_SLIDER);
+        m_ambientSlider->labelfont(FL_COURIER);
+        m_ambientSlider->labelsize(12);
+		m_ambientSlider->minimum(0);
+		m_ambientSlider->maximum(1);
+		m_ambientSlider->step(0.01);
+		m_ambientSlider->value(m_fAmbient);
+		m_ambientSlider->align(FL_ALIGN_RIGHT);
+		m_ambientSlider->callback(cb_ambientSlides);
+
+		// install slider Threshhold
+		m_thresholdSlider = new Fl_Value_Slider(10, 180, 180, 20, "Threshhold");
+		m_thresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_thresholdSlider->type(FL_HOR_NICE_SLIDER);
+        m_thresholdSlider->labelfont(FL_COURIER);
+        m_thresholdSlider->labelsize(12);
+		m_thresholdSlider->minimum(0);
+		m_thresholdSlider->maximum(1);
+		m_thresholdSlider->step(0.01);
+		m_thresholdSlider->value(m_fThreshhold);
+		m_thresholdSlider->align(FL_ALIGN_RIGHT);
+		m_thresholdSlider->callback(cb_threshholdSlides);
+
+		// install lightbutton Super Samp
+		m_SuperSampButton = new Fl_Light_Button(10, 205, 120, 25,"&Super Samp");
+		m_SuperSampButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_SuperSampButton->callback(cb_superSampButton);
+
+		// install lightbutton Adapt Supper
+		m_AdaptSupperButton = new Fl_Light_Button(140, 205, 130, 25,"&Adapt Supper");
+		m_AdaptSupperButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_AdaptSupperButton->callback(cb_adaptSupperButton);
+
+		// install lightbutton Jitter
+		m_JitterButton = new Fl_Light_Button(280, 205, 60, 25,"&Jitter");
+		m_JitterButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_JitterButton->callback(cb_jitterButton);
+
+		// install slider Sup-pixel
+		m_supPixelSlider = new Fl_Value_Slider(10, 235, 180, 20, "Number of sup-pixel");
+		m_supPixelSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_supPixelSlider->type(FL_HOR_NICE_SLIDER);
+        m_supPixelSlider->labelfont(FL_COURIER);
+        m_supPixelSlider->labelsize(12);
+		m_supPixelSlider->minimum(1);
+		m_supPixelSlider->maximum(5);
+		m_supPixelSlider->step(1);
+		m_supPixelSlider->value(m_nSupPixel);
+		m_supPixelSlider->align(FL_ALIGN_RIGHT);
+		m_supPixelSlider->callback(cb_supPixelSlides);
+
+		// install lightbutton Background
+		m_backgroundButton = new Fl_Light_Button(10, 260, 110, 25,"&Background");
+		m_backgroundButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_backgroundButton->callback(cb_backgroundButton);
+		m_backgroundButton->deactivate();
+
+		// install lightbutton Texture
+		m_textureButton = new Fl_Light_Button(135, 260, 85, 25,"&Texture");
+		m_textureButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_textureButton->callback(cb_textureButton);
+		m_textureButton->deactivate();
+
+		// install lightbutton Bump mapping
+		m_bumpMappingButton = new Fl_Light_Button(220, 260, 120, 25,"&Bump mapping");
+		m_bumpMappingButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_bumpMappingButton->callback(cb_bumpMappingButton);
+		m_bumpMappingButton->deactivate();
+
+		// install lightbutton DOP
+		m_DOFButton = new Fl_Light_Button(10, 290, 60, 25,"&DOF");
+		m_DOFButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_DOFButton->callback(cb_DOFButton);
+
+		// install lightbutton Glossy
+		m_glossyButton = new Fl_Light_Button(80, 290, 70, 25,"&Glossy");
+		m_glossyButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_glossyButton->callback(cb_glossyButton);
+
+		// install lightbutton Soft Shadow
+		m_softShadowButton = new Fl_Light_Button(160, 290, 100, 25,"&Soft Shadow");
+		m_softShadowButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_softShadowButton->callback(cb_softShadowButton);
+
+		// install lightbutton Motion
+		m_motionButton = new Fl_Light_Button(270, 290, 70, 25,"&Motion");
+		m_motionButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_motionButton->callback(cb_motionButton);
+
+		// install slider Focal Length
+		m_focalLengthSlider = new Fl_Value_Slider(10, 320, 180, 20, "Focal Length");
+		m_focalLengthSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_focalLengthSlider->type(FL_HOR_NICE_SLIDER);
+        m_focalLengthSlider->labelfont(FL_COURIER);
+        m_focalLengthSlider->labelsize(12);
+		m_focalLengthSlider->minimum(1);
+		m_focalLengthSlider->maximum(5);
+		m_focalLengthSlider->step(0.01);
+		m_focalLengthSlider->value(m_fFocalLength);
+		m_focalLengthSlider->align(FL_ALIGN_RIGHT);
+		m_focalLengthSlider->callback(cb_focalLengthSlider);
+
+		// install slider Aperture Size
+		m_apertureSizeSlider = new Fl_Value_Slider(10, 345, 180, 20, "Aperture Size");
+		m_apertureSizeSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_apertureSizeSlider->type(FL_HOR_NICE_SLIDER);
+        m_apertureSizeSlider->labelfont(FL_COURIER);
+        m_apertureSizeSlider->labelsize(12);
+		m_apertureSizeSlider->minimum(1);
+		m_apertureSizeSlider->maximum(5);
+		m_apertureSizeSlider->step(1);
+		m_apertureSizeSlider->value(m_nApertureSize);
+		m_apertureSizeSlider->align(FL_ALIGN_RIGHT);
+		m_apertureSizeSlider->callback(cb_apertureSizeSlider);
+
+		m_renderButton = new Fl_Button(270, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
 		m_renderButton->callback(cb_render);
 
-		m_stopButton = new Fl_Button(240, 55, 70, 25, "&Stop");
+		m_stopButton = new Fl_Button(270, 55, 70, 25, "&Stop");
 		m_stopButton->user_data((void*)(this));
 		m_stopButton->callback(cb_stop);
 
