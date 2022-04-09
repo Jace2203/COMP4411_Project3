@@ -23,12 +23,15 @@ public:
         , kd( vec3f( 0.0, 0.0, 0.0 ) )
         , kr( vec3f( 0.0, 0.0, 0.0 ) )
         , kt( vec3f( 0.0, 0.0, 0.0 ) )
+        , map(nullptr) 
+        , width(0)
+        , height(0)
         , shininess( 0.0 ) 
 		, index(1.0) {}
 
     Material( const vec3f& e, const vec3f& a, const vec3f& s, 
               const vec3f& d, const vec3f& r, const vec3f& t, double sh, double in)
-        : ke( e ), ka( a ), ks( s ), kd( d ), kr( r ), kt( t ), shininess( sh ), index( in ) {}
+        : ke( e ), ka( a ), ks( s ), kd( d ), kr( r ), kt( t ), map(nullptr), width(0), height(0), shininess( sh ), index( in ) {}
 
 	virtual vec3f shade( Scene *scene, const ray& r, const isect& i ) const;
 
@@ -39,6 +42,9 @@ public:
     vec3f kr;                    // reflective
     vec3f kt;                    // transmissive
     
+    unsigned char* map;
+    int width, height;
+
     double shininess;
     double index;               // index of refraction
 

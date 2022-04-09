@@ -430,7 +430,11 @@ static Material *processMaterial( Obj *child, mmap *bindings )
         mat->ks = tupleToVec( getField( child, "specular" ) );
     }
     if( hasField( child, "diffuse" ) ) {
-        mat->kd = tupleToVec( getField( child, "diffuse" ) );
+		Obj* diffuse = getField( child, "diffuse");
+		if (diffuse->getTypeName() == string("tuple"))
+			mat->kd = tupleToVec(diffuse);
+		else
+			diffuse->getMap(mat->map, mat->width, mat->height);
     }
     if( hasField( child, "reflective" ) ) {
         mat->kr = tupleToVec( getField( child, "reflective" ) );

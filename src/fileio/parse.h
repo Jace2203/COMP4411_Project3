@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 
+#include "bitmap.h"
+
 using namespace std;
 
 class Exception
@@ -72,6 +74,8 @@ public:
 	{ throw ObjTypeMismatch( string( "tuple" ), getTypeName() ); }
 	virtual const dict&  getDict() const 
 	{ throw ObjTypeMismatch( string( "dict" ), getTypeName() ); }
+	virtual void getMap(unsigned char*& bmp, int& w, int& h) const
+	{ throw ObjTypeMismatch( string( "map" ), getTypeName() ); }
 
 	virtual string 		 getName() const
 	{ throw ObjTypeMismatch( string( "named" ), getTypeName() ); }
@@ -230,6 +234,43 @@ public:
 
 private:
 	dict val;
+};
+
+class MapObj
+	: public Obj
+{
+public:
+	MapObj( const string& str )
+		: Obj()
+		, path(str)
+		, map(nullptr)
+		, width(0)
+		, height(0)
+	{
+		char name[100];
+		strcpy(name, path.c_str());
+		map = readBMP(name, width, height);
+	}
+	virtual ~MapObj()
+	{
+	}
+
+	virtual string getTypeName() const { return string( "dict" ); }
+	virtual void printOn( ostream& os ) const 
+	{ 
+		bool first = true;
+		os << '{';
+		os << "Texture Map=" << path;
+		os << ", width=" << width;
+		os << ", height=" << height;
+		os << '}';
+	}
+	virtual void getMap(unsigned char*& bmp, int& w, int& h) const { bmp = map; w = width; h = height; }
+
+private:
+	string path;
+	unsigned char* map;
+	int width, height;
 };
 
 class NamedObj
