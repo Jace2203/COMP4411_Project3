@@ -529,9 +529,28 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			throw ParseError( "No info for point_light" );
 		}
 
-		scene->add( new PointLight( scene, 
+		PointLight* light = new PointLight( scene, 
 			tupleToVec( getField( child, "position" ) ),
-			tupleToVec( getColorField( child ) ) ) );
+			tupleToVec( getColorField( child ) ) );
+
+
+		if( hasField( child, "constant_attenuation_coeff" ) ) light->a = getField( child, "constant_attenuation_coeff" )->getScalar();
+		if( hasField( child, "linear_attenuation_coeff" ) ) light->b = getField( child, "linear_attenuation_coeff" )->getScalar();
+		if( hasField( child, "quadratic_attenuation_coeff" ) ) light->c = getField( child, "quadratic_attenuation_coeff" )->getScalar();
+
+		scene->add( light );
+	} else if( name == "ambient_light" ) {
+			scene->ambient_Light = tupleToVec( getColorField( child ) );
+	} else if( name == "spot_light" ) {
+		if( child == NULL ) {
+			throw ParseError( "No info for directional_light" );
+		}
+
+		scene->add( new SpotLight( scene, 
+			tupleToVec( getField( child, "position" ) ),
+			tupleToVec( getField( child, "colour" ) ),
+			tupleToVec( getField( child, "direction" ) ),
+			tupleToVec( getField( child, "edgeplace" ) ) ) );
 	} else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
