@@ -57,7 +57,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1);
 		}
 
-		if (!m.kt.iszero())
+		if (m.index != 1)
 		{
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
 			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), thresh, depth - 1);

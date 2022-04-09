@@ -17,7 +17,7 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return i.getMaterial().ke;
+		return i.getMaterial().kt;
 
     return vec3f(1, 1, 1);
 }
@@ -43,7 +43,15 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 
 	double d = (position - P).length();
 
-	return min(1.0, 1 / (a + b * d + c * d * d));
+	// double a_factor = traceUI->getConstant();
+	// double b_factor = traceUI->getLinear();
+	// double c_factor = traceUI->getQuadric();
+
+	double a_factor = 1;
+	double b_factor = 1;
+	double c_factor = 1;
+
+	return min(1.0, 1 / (a * a_factor + b * b_factor * d + c * c_factor * d * d));
 }
 
 vec3f PointLight::getColor( const vec3f& P ) const
@@ -62,7 +70,7 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return i.getMaterial().ke;
+		return i.getMaterial().kt;
 
     return vec3f(1, 1, 1);
 }

@@ -533,7 +533,6 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec( getField( child, "position" ) ),
 			tupleToVec( getColorField( child ) ) );
 
-
 		if( hasField( child, "constant_attenuation_coeff" ) ) light->a = getField( child, "constant_attenuation_coeff" )->getScalar();
 		if( hasField( child, "linear_attenuation_coeff" ) ) light->b = getField( child, "linear_attenuation_coeff" )->getScalar();
 		if( hasField( child, "quadratic_attenuation_coeff" ) ) light->c = getField( child, "quadratic_attenuation_coeff" )->getScalar();
