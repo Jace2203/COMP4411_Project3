@@ -35,7 +35,6 @@ public:
     static vec3f reflect(const vec3f &I, const vec3f &N) { return I - (2 * I.dot(N) * N); } 
     static vec3f refract(const vec3f &I, const vec3f &N, const double index);
 
-
 protected:
 	vec3f p;
 	vec3f d;

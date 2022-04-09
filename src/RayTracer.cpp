@@ -21,7 +21,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), traceUI->getDepth() ).clamp();
+	return traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -43,6 +43,8 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
 
+		//std::cout << thresh << endl;
+
 		const Material& m = i.getMaterial();
 
 		if (!depth)
@@ -51,13 +53,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f refl(0, 0, 0);
 		vec3f refr(0, 0, 0);
 
-		if (!m.kr.iszero())
+		if (!m.kr.iszero() && m.kr.length() > thresh.length())
 		{
 			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
 			refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1);
 		}
 
-		if (m.index != 1)
+		if (m.index != 1 && m.kt.length() > thresh.length())
 		{
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
 			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), thresh, depth - 1);

@@ -270,7 +270,7 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
-	vec3f ambient_Light = vec3f(0, 0, 0);
+	vec3f ambient_Light = vec3f(1, 1, 1);
 
 private:
     list<Geometry*> objects;

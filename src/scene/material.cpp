@@ -20,6 +20,7 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 	vec3f V = r.getDirection().normalize();
 	vec3f P = r.at(i.t);
+	vec3f diffuse, specular;
 
 	// emissive
 	vec3f result = ke + prod(ka, scene->ambient_Light) * traceUI->getAmbient();
@@ -28,19 +29,21 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	for (auto& it = scene->beginLights(); it != scene->endLights(); it++)
 	{
 		vec3f I((*it)->getColor(P));
-		// if (I.length() < (vec3f(1, 1 ,1) * 0.15).length())
-		// 	continue;
+		if (I.length() < (vec3f(1, 1 ,1) * traceUI->getThreshhold() ).length())
+			continue;
 
 		vec3f L((*it)->getDirection(P));
 		vec3f R(ray::reflect(L, i.N).normalize());
 
 		vec3f atten((*it)->shadowAttenuation(P) * (*it)->distanceAttenuation(P));
+		if (atten.length() < (vec3f(1, 1 ,1) * traceUI->getThreshhold() ).length())
+			continue;
 
 		// diffuse
-		vec3f diffuse(kd * max(i.N.normalize() * L.normalize(), 0.0));
+		diffuse = (kd * max(i.N.normalize() * L.normalize(), 0.0));
 
 		// specular
-		vec3f specular(ks * pow(max(R.dot(V), 0.0), shininess * 128));
+		specular = (ks * pow(max(R.dot(V), 0.0), shininess * 128));
 
 		result += prod(prod(diffuse + specular, atten), I);
 	}
