@@ -17,7 +17,7 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return vec3f(0, 0 ,0);
+		return i.getMaterial().ke;
 
     return vec3f(1, 1, 1);
 }
@@ -62,7 +62,7 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return vec3f(0, 0 ,0);
+		return i.getMaterial().ke;
 
     return vec3f(1, 1, 1);
 }

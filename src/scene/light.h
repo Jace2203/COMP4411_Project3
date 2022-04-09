@@ -3,6 +3,10 @@
 
 #include "scene.h"
 
+#include "../ui/TraceUI.h"
+
+extern TraceUI* traceUI;
+
 class Light
 	: public SceneElement
 {
@@ -45,9 +49,9 @@ public:
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
 
-	double a = 0;
-	double b = 0;
-	double c = 0;
+	double a = traceUI->getConstant();
+	double b = traceUI->getLinear();
+	double c = traceUI->getQuadric();
 
 protected:
 	vec3f position;
