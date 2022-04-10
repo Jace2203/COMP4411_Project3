@@ -34,6 +34,8 @@ bool Square::intersectLocal( const ray& r, isect& i ) const
 	} else {
 		i.N = vec3f( 0.0, 0.0, 1.0 );
 	}
+	i.u = P[0] + 0.5;
+	i.v = P[1] + 0.5;
 
 	return true;
 }

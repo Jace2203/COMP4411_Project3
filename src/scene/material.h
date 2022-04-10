@@ -33,6 +33,8 @@ public:
               const vec3f& d, const vec3f& r, const vec3f& t, double sh, double in)
         : ke( e ), ka( a ), ks( s ), kd( d ), kr( r ), kt( t ), map(nullptr), width(0), height(0), shininess( sh ), index( in ) {}
 
+    ~Material() { delete[] map; }
+
 	virtual vec3f shade( Scene *scene, const ray& r, const isect& i ) const;
 
     vec3f ke;                    // emissive

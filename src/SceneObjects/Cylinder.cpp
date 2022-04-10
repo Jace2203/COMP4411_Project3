@@ -2,6 +2,8 @@
 
 #include "Cylinder.h"
 
+#define M_PI            3.1415926535897932384
+
 bool Cylinder::intersectLocal( const ray& r, isect& i ) const
 {
 	i.obj = this;
@@ -12,11 +14,38 @@ bool Cylinder::intersectLocal( const ray& r, isect& i ) const
 			if( ii.t < i.t ) {
 				i = ii;
 				i.obj = this;
+				vec3f P = r.at(i.t);
+				double theta = atan2(P[1], P[0]) + M_PI;
+				i.u = theta / (2 * M_PI);
+				i.v = P[2];
+				return true;
 			}
+		}
+		vec3f P = r.at(i.t);
+		if (i.N[2] > 0.0)
+		{
+			i.u = (P[0] + 1) / 2;
+			i.v = (P[1] + 1) / 2;
+		}
+		else
+		{
+			i.u = (-P[0] + 1) / 2;
+			i.v = (P[1] + 1) / 2;
 		}
 		return true;
 	} else {
-		return intersectBody( r, i );
+		if( intersectBody( r, i ))
+		{
+			vec3f P = r.at(i.t);
+			double theta = atan2(P[1], P[0]) + M_PI;
+			i.u = theta / (2 * M_PI);
+			i.v = P[2];
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 

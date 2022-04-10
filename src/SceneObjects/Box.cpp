@@ -40,16 +40,48 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 	if (abs(tzMin - tMin) < RAY_EPSILON)
 		axis = 2;
 
+	vec3f P = r.at(tMin);
+
 	switch (axis)
 	{
 	case 0:
 		i.N = vec3f((r.getDirection()[0] < 0.0) ? 1.0 : -1.0, 0.0, 0.0);
+		if (i.N[0] == -1.0)
+		{
+			i.u = P[2] + 0.5;
+			i.v = P[1] + 0.5;
+		}
+		else
+		{
+			i.u = -P[2] + 0.5;
+			i.v = P[1] + 0.5;
+		}
 		break;
 	case 1:
 		i.N = vec3f(0.0, (r.getDirection()[1] < 0.0) ? 1.0 : -1.0, 0.0);
+		if (i.N[1] == -1.0)
+		{
+			i.u = P[0] + 0.5;
+			i.v = P[2] + 0.5;
+		}
+		else
+		{
+			i.u = -P[0] + 0.5;
+			i.v = -P[2] + 0.5;
+		}
 		break;
 	case 2:
 		i.N = vec3f(0.0, 0.0, (r.getDirection()[2] < 0.0) ? 1.0 : -1.0);
+		if (i.N[2] == -1.0)
+		{
+			i.u = P[0] + 0.5;
+			i.v = P[1] + 0.5;
+		}
+		else
+		{
+			i.u = -P[0] + 0.5;
+			i.v = -P[1] + 0.5;
+		}
 		break;
 	}
 }
