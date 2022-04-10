@@ -29,8 +29,15 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 		{
 			for (int i = 0; i < sampling_size + 1; i++)
 			{
-				double xx = x + (i * sub_size - 0.5)/buffer_width;
-				double yy = y + (j * sub_size - 0.5)/buffer_height;
+				int offset_x = 0, offset_y = 0;
+				if (traceUI->getJitter())
+				{
+					offset_x = rand() % 21 - 11;
+					offset_y = rand() % 21 - 11;
+				}
+
+				double xx = x + (i * sub_size - 0.5 + (offset_x / 40.0))/buffer_width;
+				double yy = y + (j * sub_size - 0.5 + (offset_y / 40.0))/buffer_height;
     			scene->getCamera()->rayThrough( xx,yy,r );
 				result += traceRay( scene, r, vec3f(1.0, 1.0, 1.0), traceUI->getDepth() );
 			}
