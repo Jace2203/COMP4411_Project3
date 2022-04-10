@@ -20,8 +20,30 @@ extern TraceUI* traceUI;
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
-    scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), traceUI->getDepth() ).clamp();
+	vec3f result = vec3f(0,0,0);
+	if (traceUI->getSuperSamp())
+	{
+		int sampling_size = traceUI->getSupPixel();
+		double sub_size = 1 / sampling_size;
+		for (int j = 0; j < sampling_size + 1; j++)
+		{
+			for (int i = 0; i < sampling_size + 1; i++)
+			{
+				double xx = x + i * (sub_size - 0.5)/buffer_width;
+				double yy = y + j * (sub_size - 0.5)/buffer_height;
+    			scene->getCamera()->rayThrough( xx,yy,r );
+				result += traceRay( scene, r, vec3f(1.0, 1.0, 1.0), traceUI->getDepth() );
+			}
+		}
+		result /= (sampling_size + 1) * (sampling_size + 1);
+		result = result.clamp();
+	}
+	else
+	{
+    	scene->getCamera()->rayThrough( x,y,r );
+		result += traceRay( scene, r, vec3f(1.0,1.0,1.0), traceUI->getDepth() ).clamp();
+	}
+	return result;
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here

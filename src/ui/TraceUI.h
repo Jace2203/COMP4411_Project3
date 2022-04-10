@@ -60,7 +60,7 @@ public:
 
 	int			getSize();
 	int			getDepth();
-	int			m_getSupPixel() { return m_nSupPixel; }
+	int			getSupPixel() { return m_nSupPixel; }
 	int			getApertureSize() { return m_nApertureSize; }
 
 	float		getConstant() { return m_fConstant; }
