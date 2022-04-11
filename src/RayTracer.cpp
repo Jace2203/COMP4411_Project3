@@ -53,13 +53,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f refl(0, 0, 0);
 		vec3f refr(0, 0, 0);
 
-		if (!m.kr.iszero() && m.kr.length() > thresh.length())
+		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
 			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
 			refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1);
 		}
 
-		if (m.index != 1 && m.kt.length() > thresh.length())
+		if (m.index != 1 && m.kt.length() >= thresh.length())
 		{
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
 			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), thresh, depth - 1);

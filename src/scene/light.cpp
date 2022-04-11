@@ -77,7 +77,7 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 
 double SpotLight::distanceAttenuation( const vec3f& P ) const
 {
-	if (direction.dot(getDirection(P)) < cutoff)
+	if (direction.dot(-getDirection(P)) < cutoff)
 		return 0.0;
 
 	return 1.0;
@@ -90,10 +90,17 @@ vec3f SpotLight::getColor( const vec3f& P ) const
 
 vec3f SpotLight::getDirection( const vec3f& P ) const
 {
-	return (position - P);
+	//std::cout << (position - P).normalize() << endl;
+	return (position - P).normalize();
 }
 
 vec3f SpotLight::shadowAttenuation(const vec3f& P) const
 {
-    return vec3f(1,1,1);
+	ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
+	isect i;
+
+	// if (scene->intersect(shadow, i))
+	// 	return i.getMaterial().kt;
+
+    return vec3f(1, 1, 1);
 }
