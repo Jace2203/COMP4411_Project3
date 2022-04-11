@@ -2,6 +2,8 @@
 
 #include "light.h"
 
+#include "vector"
+
 double DirectionalLight::distanceAttenuation( const vec3f& P ) const
 {
 	// distance to light is infinite, so f(di) goes to 0.  Return 1.
@@ -66,13 +68,83 @@ vec3f PointLight::getDirection( const vec3f& P ) const
 
 vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
+	/*
+	double radius = 0.05;
+
+	ray shadow[7] = {
+		ray(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 1,  0,  0) * radius, this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f(-1,  0,  0) * radius, this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  1,  0) * radius, this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0, -1,  0) * radius, this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  0,  1) * radius, this->getDirection(P)),
+		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  0, -1) * radius, this->getDirection(P))
+	};
+	*/
+
+	/*
+	double lower = -1,
+		   upper = 1,
+		   interval = 0.5;
+
+	int part = 0;
+
+	if (traceUI->getSoftShadow())
+	{
+		std::vector<ray> lights;
+		for(double x = lower; x <= upper; x += interval)
+			for(double y = lower; y <= upper; y += interval)
+				for(double z = lower; z <= upper; z += interval)
+				{
+					// std::cout << -getDirection(P).dot(vec3f(x, y, z) - position) << endl;
+					if (getDirection(P).dot((vec3f(x, y, z)).normalize()) <= 0.4)
+					{
+						// std::cout << 'y' << endl;
+						++part;
+						vec3f pt(position + vec3f(x, y, z).normalize() * 0.13);
+						ray shadows(P + RAY_EPSILON * (pt - P).normalize(), (pt - P).normalize());
+						lights.push_back(shadows);
+					}
+				}
+
+
+		// ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
+		isect i;
+
+		vec3f res(1, 1, 1);
+
+		// std::cout << lights.size() << endl;
+
+		for(ray shadow : lights)
+			if (rand() % 100 <= 70 &&  scene->intersect(shadow, i))
+				res -= res / part;
+
+		return res;
+	}
+	else
+	{
+		ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
+		isect i;
+
+		if (scene->intersect(shadow, i))
+			return i.getMaterial().kt;
+
+		return vec3f(1, 1, 1);
+	}
+	*/
+
 	ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
 	isect i;
 
-	if (scene->intersect(shadow, i))
-		return i.getMaterial().kt;
+	double occlusion = 1;
 
-    return vec3f(1, 1, 1);
+	if (scene->intersect(shadow, i))
+		occlusion = (shadow.at(i.t) - P).length() / (position - P).length();
+
+	if (occlusion == 1)
+		return vec3f(1, 1, 1);
+
+	return i.getMaterial().kt; 
 }
 
 double SpotLight::distanceAttenuation( const vec3f& P ) const

@@ -229,6 +229,8 @@ void TraceUI::cb_render(Fl_Widget* o, void* v)
 		Fl::check();
 		Fl::flush();
 
+		srand(time(NULL));
+
 		for (int y=0; y<height; y++) {
 			for (int x=0; x<width; x++) {
 				if (done) break;
@@ -271,6 +273,7 @@ void TraceUI::cb_render(Fl_Widget* o, void* v)
 			pUI->m_traceGlWindow->label(buffer);
 			
 		}
+		printf("finish");
 		done=true;
 		pUI->m_traceGlWindow->refresh();
 
