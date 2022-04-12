@@ -66,8 +66,19 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
-			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
-			refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1);
+			vec3f u(i.N.cross(vec3f(1, 0, 0)).normalize());
+			if (u.iszero()) u = i.N.cross(vec3f(0, 1, 0));
+			vec3f v(i.N.cross(u).normalize());
+
+			int a = (traceUI->getGlossy()) ? 2 : 0; // time = (2x + 1)^2
+
+			for(int x = -a; x <= a; ++x)
+				for(int y = -a; y <= a; ++y)
+				{
+					vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
+					reflect += (x * u + y * v) * 0.02;
+					refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1).clamp() / pow(2 * a + 1, 2);
+				}
 		}
 
 		if (m.index != 1 && m.kt.length() >= thresh.length())
