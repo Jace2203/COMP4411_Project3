@@ -1,5 +1,9 @@
 #include "camera.h"
 
+#include "../ui/TraceUI.h"
+
+extern TraceUI *traceUI;
+
 #define PI 3.14159265359
 #define SHOW(x) (cerr << #x << " = " << (x) << "\n")
 
@@ -22,7 +26,21 @@ Camera::rayThrough( double x, double y, ray &r )
     x -= 0.5;
     y -= 0.5;
     vec3f dir = look + x * u + y * v;
-    r = ray( eye, dir.normalize() );
+
+    if (traceUI->getDOF())
+    {
+        int part = 1000;
+        vec3f focus_pt = eye + dir.normalize() * traceUI->getFocalLength();
+        vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 1.0/part - 0.5, rand() % (part + 1) * 1.0/part - 0.5, 0), (u + v).normalize() ) * traceUI->getApertureSize() * 0.1;
+        r = ray( new_eye, (focus_pt - new_eye).normalize() );
+
+    }
+    else
+        r = ray( eye, dir.normalize() );
+
+    // std::cout << eye << endl;
+    // std::cout << new_eye << endl;
+
 }
 
 void

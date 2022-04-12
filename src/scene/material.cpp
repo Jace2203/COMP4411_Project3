@@ -24,13 +24,6 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 	vec3f result = ke + prod(ka, scene->ambient_Light) * traceUI->getAmbient();
 
-	double shadow_buffer = new double[traceUI->getSize() * (int)(width / pUI->raytracer->aspectRatio() + 0.5)] = {};
-
-	for (auto& it = scene->beginLights(); it != scene->endLights(); it++)
-	{
-
-	}
-
 	for (auto& it = scene->beginLights(); it != scene->endLights(); it++)
 	{
 		vec3f I((*it)->getColor(P));
