@@ -13,7 +13,10 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
     // Add box intersection code here.
 	// it currently ignores all boxes and just returns false.
 	double tMin, tMax;
-	BoundingBox bound = ComputeLocalBoundingBox();
+	BoundingBox bound = BoundingBox();
+    bound.max = vec3f(0.5, 0.5, 0.5);
+	bound.min = vec3f(-0.5, -0.5, -0.5);
+
 	if (!bound.intersect(r, tMin, tMax))
 		return false;
 	
