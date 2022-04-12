@@ -165,7 +165,6 @@ vec3f SpotLight::getColor( const vec3f& P ) const
 
 vec3f SpotLight::getDirection( const vec3f& P ) const
 {
-	//std::cout << (position - P).normalize() << endl;
 	return (position - P).normalize();
 }
 

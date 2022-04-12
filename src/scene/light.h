@@ -62,7 +62,7 @@ class SpotLight
 {
 public:
 	SpotLight( Scene *scene, const vec3f& pos, const vec3f& color, const vec3f& dir, const vec3f& edgeplace)
-		: Light( scene, color ), position( pos ), direction(dir.normalize()), edgeplace(edgeplace), cutoff(cos(edgeplace[0] * 3.1415926535 / 180)) {}
+		: Light( scene, color ), position( pos ), direction(dir.normalize()), cutoff( cos(edgeplace[0] * 3.14159265 / 180) ) {}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
 	virtual double distanceAttenuation( const vec3f& P ) const;
 	virtual vec3f getColor( const vec3f& P ) const;
@@ -71,7 +71,6 @@ public:
 protected:
 	vec3f position;
 	vec3f direction;
-	vec3f edgeplace;
 	double cutoff;
 };
 
