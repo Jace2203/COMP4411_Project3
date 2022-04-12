@@ -4,6 +4,8 @@
 
 #include "vecmath/vecmath.h"
 
+#define M_PI 3.1415926535897932384
+
 PerlinNoise* PerlinNoise::instance = nullptr;
 
 PerlinNoise::PerlinNoise()
@@ -28,7 +30,10 @@ double* PerlinNoise::GenerateNoise2D(int size, int octave, int scale)
     scale += 1;
     vec3f* grad = new vec3f[scale * scale];
     for (int i = 0; i < scale * scale; i++)
-        grad[i] = vec3f((rand() % 2 ? 1 : -1), (rand() % 2 ? 1 : -1), 0);
+    {
+        double theta = double(rand()) / RAND_MAX * M_PI * 2;
+        grad[i] = vec3f(cos(theta) * 1, sin(theta) * 1, 0.0);
+    }
 
     double* result = new double[size * size];
 
@@ -49,12 +54,11 @@ double* PerlinNoise::GenerateNoise2D(int size, int octave, int scale)
             double C = vec3f(xx - x0, yy - y1, 0.0).dot(grad[y1 * scale + x0]);
             double D = vec3f(xx - x1, yy - y1, 0.0).dot(grad[y1 * scale + x1]);
 
-            printf("%f, %f, %f, %f\n", A, B, C, D);
-            double AB = A + xx * (B - A);
-            double CD = C + xx * (D - C);
+            double AB = A + (xx - x0) * (B - A);
+            double CD = C + (xx - x0) * (D - C);
 
-            double v = AB + yy * (CD - AB);
-            result[y * size + x] = v / 4;
+            double v = AB + (yy - y0) * (CD - AB);
+            result[y * size + x] = fade((v + 1)/2);
         }
     }
 
