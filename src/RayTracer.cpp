@@ -21,7 +21,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
 	vec3f res(0, 0, 0);
 
-	int a = (traceUI->getDOF()) ? 100 : 1;
+	int a = (traceUI->getDOF()) ? 50 : 1;
 
 	for(int i = 0; i < a; ++i)
 	{
