@@ -37,7 +37,7 @@ Camera::rayThrough( double x, double y, ray &r )
         vec3f focus_pt = eye + dir.normalize() * traceUI->getFocalLength();
         // vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 1.0/part - 0.5, rand() % (part + 1) * 1.0/part - 0.5, 0), (u + v).normalize() ) * traceUI->getApertureSize() * 0.1;
         
-        vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 2.0/part - 1.0, rand() % (part + 1) * 2.0/part - 1.0, 0), (ux + vx).normalize() ) * traceUI->getApertureSize() * 0.01 * traceUI->getFocalLength();
+        vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 2.0/part - 1.0, rand() % (part + 1) * 2.0/part - 1.0, 0), (ux + vx).normalize() ) * traceUI->getApertureSize() * 0.1;
         r = ray( new_eye, (focus_pt - new_eye).normalize() );
     }
     else
