@@ -120,15 +120,29 @@ void TraceUI::cb_threshholdSlides(Fl_Widget* o, void* v)
 void TraceUI::cb_superSampButton(Fl_Widget* o, void* v)
 {
 	if (((TraceUI*)(o->user_data()))->m_bSuperSamp)
+	{
 		((TraceUI*)(o->user_data()))->m_bSuperSamp = false;
-	else ((TraceUI*)(o->user_data()))->m_bSuperSamp = true;
+		((TraceUI*)(o->user_data()))->m_AdaptSupperButton->activate();
+	}
+	else
+	{
+		((TraceUI*)(o->user_data()))->m_bSuperSamp = true;
+		((TraceUI*)(o->user_data()))->m_AdaptSupperButton->deactivate();
+	}
 }
 
 void TraceUI::cb_adaptSupperButton(Fl_Widget* o, void* v)
 {
 	if (((TraceUI*)(o->user_data()))->m_bAdaptSupper)
+	{
 		((TraceUI*)(o->user_data()))->m_bAdaptSupper = false;
-	else ((TraceUI*)(o->user_data()))->m_bAdaptSupper = true;
+		((TraceUI*)(o->user_data()))->m_SuperSampButton->activate();
+	}
+	else
+	{
+		((TraceUI*)(o->user_data()))->m_bAdaptSupper = true;
+		((TraceUI*)(o->user_data()))->m_SuperSampButton->deactivate();
+	}
 }
 
 void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
