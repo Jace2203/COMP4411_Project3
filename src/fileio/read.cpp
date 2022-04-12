@@ -19,6 +19,7 @@
 #include "../SceneObjects/Cylinder.h"
 #include "../SceneObjects/Sphere.h"
 #include "../SceneObjects/Square.h"
+#include "../SceneObjects/Torus.h"
 #include "../scene/light.h"
 
 typedef map<string,Material*> mmap;
@@ -322,6 +323,14 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 			obj = new Cone( scene, mat, height, bottom_radius, top_radius, capped );
 		} else if( name == "square" ) {
 			obj = new Square( scene, mat );
+		} else if ( name == "torus") {
+			double radius = 1.0;
+			double ring_radius = 1.0;
+
+			maybeExtractField( child, "radius", radius);
+			maybeExtractField( child, "ring_radius", ring_radius);
+
+			obj = new Torus( scene, mat, radius, ring_radius );
 		}
 
         obj->setTransform(transform);
@@ -560,6 +569,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 				name == "cylinder" ||
 				name == "cone" ||
 				name == "square" ||
+				name == "torus" ||
 				name == "translate" ||
 				name == "rotate" ||
 				name == "scale" ||

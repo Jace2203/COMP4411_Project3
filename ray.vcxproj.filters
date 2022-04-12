@@ -52,6 +52,18 @@
       <UniqueIdentifier>{2a500cad-34e4-4544-a082-ff2e3169691d}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Header Files\vendor">
+      <UniqueIdentifier>{6207a83f-3902-420d-a09f-ee6fdd8d7f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vendor\Quartic">
+      <UniqueIdentifier>{010587d2-e826-4047-8018-fe04fece79b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vendor">
+      <UniqueIdentifier>{a5ede39a-4ead-4690-a294-0b3d3b2a7adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vendor\Quartic">
+      <UniqueIdentifier>{6a59a093-ed96-491a-ae26-b0187f6294a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\getopt.cpp">
@@ -117,6 +129,12 @@
     <ClCompile Include="src\AABB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\vendor\Quartic\quartic.cpp">
+      <Filter>Source Files\vendor\Quartic</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneObjects\Torus.cpp">
+      <Filter>Source Files\SceneObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\RayTracer.h">
@@ -175,6 +193,12 @@
     </ClInclude>
     <ClInclude Include="src\AABB.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\Quartic\quartic.h">
+      <Filter>Header Files\vendor\Quartic</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneObjects\Torus.h">
+      <Filter>Header Files\SceneObjects.</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
