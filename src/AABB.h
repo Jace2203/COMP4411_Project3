@@ -3,6 +3,8 @@
 
 #include "vecmath/vecmath.h"
 
+#include "scene/ray.h"
+
 class BoundingBox;
 class Geometry;
 
@@ -39,6 +41,8 @@ public:
 
     BoundingBox GetBoundingBox() const;
     double GetSurfaceArea() const;
+
+    bool Intersect(const ray& r, isect& i) const;
 private:
     void Update();
 

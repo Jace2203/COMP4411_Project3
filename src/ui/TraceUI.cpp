@@ -202,6 +202,11 @@ void TraceUI::cb_apertureSizeSlider(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nApertureSize=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+void TraceUI::cb_aabbButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_bAABB = !((TraceUI*)(o->user_data()))->m_bAABB;
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -348,6 +353,8 @@ TraceUI::TraceUI() {
 
 	m_nApertureSize = 2;
 	m_fFocalLength = 2;
+
+	m_bAABB = false;
 
 	m_mainWindow = new Fl_Window(100, 40, 350, 480, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
@@ -537,6 +544,11 @@ TraceUI::TraceUI() {
 		m_apertureSizeSlider->value(m_nApertureSize);
 		m_apertureSizeSlider->align(FL_ALIGN_RIGHT);
 		m_apertureSizeSlider->callback(cb_apertureSizeSlider);
+
+		// install button AABB
+		m_motionButton = new Fl_Light_Button(10, 375, 70, 25,"&AABB");
+		m_motionButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_motionButton->callback(cb_aabbButton);
 
 		m_renderButton = new Fl_Button(270, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));

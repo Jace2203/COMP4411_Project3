@@ -147,22 +147,33 @@ bool Scene::intersect( const ray& r, isect& i ) const
 	isect cur;
 	bool have_one = false;
 
-	// try the non-bounded objects
-	for( j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
-			}
+	if (traceUI->getAABBB())
+	{
+		if (tree.Intersect( r, cur ))
+		{
+			i = cur;
+			have_one = true;
 		}
 	}
+	else
+	{
+		// try the non-bounded objects
+		for( j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j ) {
+			if( (*j)->intersect( r, cur ) ) {
+				if( !have_one || (cur.t < i.t) ) {
+					i = cur;
+					have_one = true;
+				}
+			}
+		}
 
-	// try the bounded objects
-	for( j = boundedobjects.begin(); j != boundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
+		// try the bounded objects
+		for( j = boundedobjects.begin(); j != boundedobjects.end(); ++j ) {
+			if( (*j)->intersect( r, cur ) ) {
+				if( !have_one || (cur.t < i.t) ) {
+					i = cur;
+					have_one = true;
+				}
 			}
 		}
 	}

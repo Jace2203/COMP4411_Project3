@@ -112,6 +112,54 @@ double Tree::GetSurfaceArea() const
     return m_Node->GetSurfaceArea();
 }
 
+bool Tree::Intersect(const ray& r, isect& i) const
+{
+    if (m_Node->IsLeaf())
+    {
+        return m_Node->GetGeometry()->intersect(r, i);
+    }
+
+    double tMin, tMax;
+    if (m_Node->GetBoundingBox().intersect(r, tMin, tMax))
+    {
+        isect a, b;
+        bool A = m_Left->Intersect(r, a);
+        bool B = m_Right->Intersect(r, b);
+
+        if (A && B)
+        {
+            if (a.t < b.t)
+            {
+                i = a;
+                return true;
+            }
+            else
+            {
+                i = b;
+                return true;
+            }
+        }
+        else if (A)
+        {
+            i = a;
+            return true;
+        }
+        else if (B)
+        {
+            i = b;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void Tree::Update()
 {
     if (!m_Node->IsLeaf())
