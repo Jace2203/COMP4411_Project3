@@ -19,19 +19,20 @@ extern TraceUI* traceUI;
 // in an initial ray weight of (0.0,0.0,0.0) and an initial recursion depth of 0.
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
+	ray r( vec3f(0,0,0), vec3f(0,0,0) );
+
 	vec3f res(0, 0, 0);
 
-	int a = (traceUI->getDOF()) ? 50 : 1;
+	int a = (traceUI->getDOF()) ? 30 : 1;
 
 	for(int i = 0; i < a; ++i)
 	{
 		srand(time(NULL) + i);
-		ray r( vec3f(0,0,0), vec3f(0,0,0) );
 		scene->getCamera()->rayThrough( x,y,r );
-		res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp() / a;
+		res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 	}
 
-	return res;
+	return res / float(a);
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
