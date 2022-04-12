@@ -68,67 +68,31 @@ vec3f PointLight::getDirection( const vec3f& P ) const
 
 vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
-	/*
-	double radius = 0.05;
-
-	ray shadow[7] = {
-		ray(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 1,  0,  0) * radius, this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f(-1,  0,  0) * radius, this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  1,  0) * radius, this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0, -1,  0) * radius, this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  0,  1) * radius, this->getDirection(P)),
-		ray(P + RAY_EPSILON * this->getDirection(P) + vec3f( 0,  0, -1) * radius, this->getDirection(P))
-	};
-	*/
+	isect i;
 
 	if (traceUI->getSoftShadow())
 	{
-		std::vector<ray> lights;
-		vec3f u(getDirection(P).cross(vec3f(1, 0, 0)).normalize());
-		vec3f v(getDirection(P).cross(u).normalize());
-
-		double lower = -0.09,
-			   upper = 0.09,
-			   interval = 0.03;
-
-		int part = 0;
-
-		for(double x = lower; x <= upper; x += interval)
-			for(double y = lower; y <= upper; y += interval)
-				{
-					// std::cout << -getDirection(P).dot(vec3f(x, y, z) - position) << endl;
-					//if (getDirection(P).dot((vec3f(x, y, z)).normalize()) <= 0.4)
-					// std::cout << 'y' << endl;
-					// ++part;
-					// vec3f pt(position + vec3f(x, y, z).normalize() * 0.13);
-					// ray shadows(P + RAY_EPSILON * (pt - P).normalize(), (pt - P).normalize());
-					// lights.push_back(shadows);
-
-					++part;
-					vec3f pt(position + x * u + y * v);
-					ray shadows(P + RAY_EPSILON * (pt - P).normalize(), (pt - P).normalize());
-					lights.push_back(shadows);
-				}
-
-
-		// ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
-		isect i;
-
 		vec3f res(1, 1, 1);
 
-		// std::cout << lights.size() << endl;
+		vec3f u(getDirection(P).cross(vec3f(1, 0, 0)).normalize());
+		if (u.iszero()) u = (getDirection(P).cross(vec3f(0, 1, 0)).normalize());
+		vec3f v(getDirection(P).cross(u).normalize());
 
-		for(ray shadow : lights)
-			if (scene->intersect(shadow, i))
-				res -= res / part;
-
+		for(int y = 0; y < 4; ++y)
+			for(int x = 0; x < 4; ++x)
+			{
+				vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+				vec3f pt = position + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.2;
+				ray shadow(P + RAY_EPSILON * (pt - P).normalize(), (pt - P).normalize());
+				if (scene->intersect(shadow, i))
+					res -= res / 16;
+			}
+		
 		return res;
 	}
 	else
 	{
 		ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
-		isect i;
 
 		if (scene->intersect(shadow, i))
 			return i.getMaterial().kt;
