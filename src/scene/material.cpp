@@ -2,6 +2,10 @@
 #include "material.h"
 #include "light.h"
 
+#include "../RayTracer.h"
+
+extern RayTracer* theRayTracer;
+
 // Apply the phong model to this point on the surface of the object, returning
 // the color of that point.
 vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
@@ -26,7 +30,14 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 	// diffuse
 	vec3f diffuse;
-	if (map == nullptr)
+	if (traceUI->getNoiseTexture())
+	{
+		int size = theRayTracer->getNoiseSize();
+		int v = min(int(round(i.v * size)), size - 1), u = min(int(round(i.u * size)), size - 1);
+		double d = theRayTracer->getNoiseTexture()[v * size + u];
+		diffuse = vec3f(d, d, d);
+	}
+	else if (map == nullptr)
 	{
 		diffuse = kd;
 	}

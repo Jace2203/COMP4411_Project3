@@ -13,6 +13,7 @@
 #include "../RayTracer.h"
 
 static bool done;
+extern RayTracer* theRayTracer;
 
 //------------------------------------- Help Functions --------------------------------------------
 TraceUI* TraceUI::whoami(Fl_Menu_* o)	// from menu item back to UI itself
@@ -207,6 +208,27 @@ void TraceUI::cb_aabbButton(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_bAABB = !((TraceUI*)(o->user_data()))->m_bAABB;
 }
 
+void TraceUI::cb_noiseInputSlider(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nNoiseInput=int( ((Fl_Slider *)o)->value() );
+}
+
+void TraceUI::cb_noiseScaleSlider(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nNoiseScale=int( ((Fl_Slider *)o)->value() );
+}
+
+void TraceUI::cb_noiseTextureButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_bNoiseTexture = !((TraceUI*)(o->user_data()))->m_bNoiseTexture;
+}
+
+void TraceUI::cb_generateNoiseButton(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_noiseTextureButton->activate();
+	theRayTracer->setNoiseTexture();
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -355,6 +377,10 @@ TraceUI::TraceUI() {
 	m_fFocalLength = 2;
 
 	m_bAABB = false;
+
+	m_nNoiseInput = 8;
+	m_nNoiseScale = 1;
+	m_bNoiseTexture = false;
 
 	m_mainWindow = new Fl_Window(100, 40, 350, 480, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
@@ -546,9 +572,42 @@ TraceUI::TraceUI() {
 		m_apertureSizeSlider->callback(cb_apertureSizeSlider);
 
 		// install button AABB
-		m_motionButton = new Fl_Light_Button(10, 375, 70, 25,"&AABB");
+		m_motionButton = new Fl_Light_Button(10, 375, 70, 25,"AABB");
 		m_motionButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_motionButton->callback(cb_aabbButton);
+
+		m_noiseInputSlider = new Fl_Value_Slider(10, 405, 180, 20, "Noise Input");
+		m_noiseInputSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_noiseInputSlider->type(FL_HOR_NICE_SLIDER);
+        m_noiseInputSlider->labelfont(FL_COURIER);
+        m_noiseInputSlider->labelsize(12);
+		m_noiseInputSlider->minimum(8);
+		m_noiseInputSlider->maximum(12);
+		m_noiseInputSlider->step(1);
+		m_noiseInputSlider->value(m_nNoiseInput);
+		m_noiseInputSlider->align(FL_ALIGN_RIGHT);
+		m_noiseInputSlider->callback(cb_noiseInputSlider); // Need to change
+		
+		m_noiseScaleSlider = new Fl_Value_Slider(10, 430, 180, 20, "Noise Scale");
+		m_noiseScaleSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_noiseScaleSlider->type(FL_HOR_NICE_SLIDER);
+        m_noiseScaleSlider->labelfont(FL_COURIER);
+        m_noiseScaleSlider->labelsize(12);
+		m_noiseScaleSlider->minimum(1);
+		m_noiseScaleSlider->maximum(32);
+		m_noiseScaleSlider->step(1);
+		m_noiseScaleSlider->value(m_nNoiseScale);
+		m_noiseScaleSlider->align(FL_ALIGN_RIGHT);
+		m_noiseScaleSlider->callback(cb_noiseScaleSlider); // Need to change
+
+		m_noiseTextureButton = new Fl_Light_Button(10, 455, 160, 25, "Noise Texture");
+		m_noiseTextureButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_noiseTextureButton->callback(cb_noiseTextureButton); // Need to change
+		m_noiseTextureButton->deactivate();
+
+		m_calNoiseButton = new Fl_Button(180, 455, 160, 25, "Generate Noise");
+		m_calNoiseButton->user_data((void*)(this));
+		m_calNoiseButton->callback(cb_generateNoiseButton);
 
 		m_renderButton = new Fl_Button(270, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
