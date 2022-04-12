@@ -32,6 +32,9 @@ private:
 	Scene *scene;
 
 	bool m_bSceneLoaded;
+
+	vec3f AdaptSampling(double x, double y, int depth);
+	vec3f AdaptSampling(double x, double y, int depth, int a, int b, int c, int d, int division, vec3f*** cache);
 };
 
 #endif // __RAYTRACER_H__

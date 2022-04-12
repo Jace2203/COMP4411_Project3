@@ -17,8 +17,12 @@ using namespace std;
 #include "camera.h"
 #include "../vecmath/vecmath.h"
 
+#include "../AABB.h"
+
 class Light;
 class Scene;
+class Node;
+class Tree;
 
 class SceneElement
 {
@@ -258,6 +262,7 @@ public:
 	{
 		obj->ComputeBoundingBox();
 		objects.push_back( obj );
+		tree.InsertLeaf(obj);
 	}
 	void add( Light* light )
 	{ lights.push_back( light ); }
@@ -278,6 +283,8 @@ private:
 	list<Geometry*> boundedobjects;
     list<Light*> lights;
     Camera camera;
+
+	Tree tree;
 	
 	// Each object in the scene, provided that it has hasBoundingBoxCapability(),
 	// must fall within this bounding box.  Objects that don't have hasBoundingBoxCapability()

@@ -24,6 +24,20 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 	vec3f result = ke + prod(ka, scene->ambient_Light) * traceUI->getAmbient();
 
+	// diffuse
+	if (map == nullptr)
+	{
+		diffuse = kd;
+	}
+	else
+	{
+		int v = min(int(round(i.v * height)), height - 1), u = min(int(round(i.u * width)), width - 1);
+		int a = (v * width + u) * 3;
+		unsigned char* d = &map[a];
+		diffuse = vec3f(d[0]/255.0, d[1]/255.0, d[2]/255.0);
+	}
+
+	// ambient
 	for (auto& it = scene->beginLights(); it != scene->endLights(); it++)
 	{
 		vec3f I((*it)->getColor(P));
@@ -33,12 +47,12 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 		vec3f atten((*it)->shadowAttenuation(P) * (*it)->distanceAttenuation(P));
 
 		// diffuse
-		diffuse = (kd * max(i.N.normalize() * L.normalize(), 0.0));
+		vec3f d = diffuse * max(i.N.normalize() * L.normalize(), 0.0);
 
 		// specular
 		specular = (ks * pow(max(R.dot(V), 0.0), shininess * 128));
 
-		result += prod(prod(diffuse + specular, atten), I);
+		result += prod(prod(d + specular, atten), I);
 	}
 
 	return result.clamp();

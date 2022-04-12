@@ -3,6 +3,8 @@
 
 #include "Cone.h"
 
+#define M_PI            3.1415926535897932384
+
 bool Cone::intersectLocal( const ray& r, isect& i ) const
 {
 	i.obj = this;
@@ -13,11 +15,53 @@ bool Cone::intersectLocal( const ray& r, isect& i ) const
 			if( ii.t < i.t ) {
 				i = ii;
 				i.obj = this;
+
+				vec3f P = r.at(i.t);
+				double theta = atan2(P[1], P[0]) + M_PI;
+				i.u = theta / (2 * M_PI);
+				if (height < 0.0)
+				{
+					i.v = 1 - (P[2] / height);
+				}
+				else
+				{
+					i.v = P[2] / height;
+				}
+				return true;
 			}
+		}
+		vec3f P = r.at(i.t);
+		if (i.N[2] > 0.0)
+		{
+			i.u = (P[0] + t_radius) / (2 * t_radius);
+			i.v = (P[1] + t_radius) / (2 * t_radius);
+		}
+		else
+		{
+			i.u = (-P[0] + b_radius) / (2 * b_radius);
+			i.v = (P[1] + b_radius) / (2 * b_radius);
 		}
 		return true;
 	} else {
-		return intersectBody( r, i );
+		if( intersectBody( r, i ))
+		{
+			vec3f P = r.at(i.t);
+			double theta = atan2(P[1], P[0]) + M_PI;
+			i.u = theta / (2 * M_PI);
+			if (height < 0.0)
+			{
+				i.v = 1 - (P[2] / height);
+			}
+			else
+			{
+				i.v = P[2] / height;
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 

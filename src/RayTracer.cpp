@@ -197,3 +197,67 @@ void RayTracer::tracePixel( int i, int j )
 	pixel[1] = (int)( 255.0 * col[1]);
 	pixel[2] = (int)( 255.0 * col[2]);
 }
+
+vec3f RayTracer::AdaptSampling(double x, double y, int depth)
+{
+	int size = pow(2, depth) + 1;
+	vec3f*** cache = new vec3f**[size];
+	for (int i = 0; i < size; i++)
+	{
+		cache[i] = new vec3f*[size];
+		for (int j = 0; j < size; j++)
+		{
+			cache[i][j] = nullptr;
+		}
+	}
+
+	vec3f result = AdaptSampling(x, y, depth, 0, size - 1, 0, size - 1, 1, cache);
+
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			delete cache[i][j];
+		}
+		delete[] cache[i];
+	}
+
+	return result;
+}
+
+vec3f RayTracer::AdaptSampling(double x, double y, int depth, int a, int b, int c, int d, int division, vec3f*** cache)
+{
+	vec3f result = vec3f(0.0, 0.0, 0.0);
+    ray r( vec3f(0,0,0), vec3f(0,0,0) );
+	scene->getCamera()->rayThrough( x,y,r );
+	if (cache[(b - a) / 2][(d - c) / 2] == nullptr)
+		cache[(b - a) / 2][(d - c) / 2] = new vec3f(traceRay( scene, r, vec3f(1.0, 1.0, 1.0), traceUI->getDepth()));
+
+	double sub_size = 1.0 / division;
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			double xx = x + (i * sub_size - sub_size / 2) / buffer_width;
+			double yy = y + (j * sub_size - sub_size / 2) / buffer_height;
+
+			if (cache[(i ? b : a)][(j ? d : c)] == nullptr)
+			{
+    			scene->getCamera()->rayThrough( xx,yy,r );
+				cache[(i ? b : a)][(j ? d : c)] = new vec3f(traceRay(scene, r, vec3f(1.0, 1.0, 1.0), traceUI->getDepth()));
+			}
+
+			vec3f diff = *cache[(i ? b : a)][(j ? d : c)] - *cache[(b - a) / 2][(d - c) / 2];
+			if (diff.length_squared() > 0.001 && depth > 1)
+				result += AdaptSampling((xx + x)/2, (yy + y)/2, depth - 1, 
+				(i ? (a + b)/2 : a), (i ? b : (a + b)/2),
+				(j ? (c + d)/2 : c), (j ? d : (c + d)/2),
+				division * 2, cache);
+			else
+				result += *cache[(i ? b : a)][(j ? d : c)];
+		}
+	}
+	result /= 4;
+
+	return result;
+}

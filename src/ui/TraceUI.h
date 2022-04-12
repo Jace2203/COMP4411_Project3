@@ -47,6 +47,7 @@ public:
 	Fl_Light_Button*	m_glossyButton;
 	Fl_Light_Button*	m_softShadowButton;
 	Fl_Light_Button*	m_motionButton;
+	Fl_Light_Button*	m_aabbButton;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
@@ -60,7 +61,7 @@ public:
 
 	int			getSize();
 	int			getDepth();
-	int			m_getSupPixel() { return m_nSupPixel; }
+	int			getSupPixel() { return m_nSupPixel; }
 	int			getApertureSize() { return m_nApertureSize; }
 
 	float		getConstant() { return m_fConstant; }
@@ -80,6 +81,7 @@ public:
 	bool		getGlossy() { return m_bGlossy; }
 	bool		getSoftShadow() { return m_bSoftShadow; }
 	bool		getMotion() { return m_bMotion; }
+	bool		getAABBB() { return m_bAABB; }
 
 private:
 	RayTracer*	raytracer;
@@ -106,6 +108,7 @@ private:
 	bool		m_bGlossy;
 	bool		m_bSoftShadow;
 	bool		m_bMotion;
+	bool		m_bAABB;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -145,6 +148,8 @@ private:
 
 	static void cb_focalLengthSlider(Fl_Widget* o, void* v);
 	static void cb_apertureSizeSlider(Fl_Widget* o, void* v);
+
+	static void cb_aabbButton(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

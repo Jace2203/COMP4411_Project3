@@ -46,7 +46,7 @@ class isect
 {
 public:
     isect()
-        : obj( NULL ), t( 0.0 ), N(), material(0) {}
+        : obj( NULL ), t( 0.0 ), N(), u(0.0), v(0.0), material(0) {}
 
     ~isect()
     {
@@ -65,6 +65,8 @@ public:
             obj = other.obj;
             t = other.t;
             N = other.N;
+            u = other.u;
+            v = other.v;
 //            material = other.material ? new Material( *(other.material) ) : 0;
 			if( other.material )
             {
@@ -85,6 +87,7 @@ public:
     const SceneObject 	*obj;
     double t;
     vec3f N;
+    double u, v;
     Material *material;         // if this intersection has its own material
                                 // (as opposed to one in its associated object)
                                 // as in the case where the material was interpolated
