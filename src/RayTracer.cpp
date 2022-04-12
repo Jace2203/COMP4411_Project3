@@ -44,12 +44,9 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 			for(int x = 0; x < 4; ++x)
 			{
 				vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
-				// std::cout << offset << endl;
 				vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.1;
 				r = ray( new_eye, (focus_pt - new_eye).normalize() );
 				res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
-				// std::cout << r.getDirection() << endl;
-				// std::cout << res << endl;
 			}
 	}
 

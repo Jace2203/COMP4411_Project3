@@ -26,29 +26,7 @@ Camera::rayThrough( double x, double y, ray &r )
     x -= 0.5;
     y -= 0.5;
     vec3f dir = (look + x * u + y * v).normalize();
-
-    // if (!traceUI->getDOF())
-        r = ray( eye, dir.normalize());
-    // else
-    // {
-    //     vec3f ux = dir.cross(vec3f(1, 0, 0)).normalize();
-    //     if (ux.iszero()) ux = dir.cross(vec3f(0, 1, 0)).normalize();
-    //     vec3f vx = dir.cross(ux).normalize();
-
-    //     int part = 50;
-    //     vec3f focus_pt = eye + dir.normalize() * traceUI->getFocalLength();
-    //     // vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 1.0/part - 0.5, rand() % (part + 1) * 1.0/part - 0.5, 0), (u + v).normalize() ) * traceUI->getApertureSize() * 0.1;
-        
-    //     vec3f new_eye = eye + prod(vec3f(rand() % (part + 1) * 2.0/part - 1.0, rand() % (part + 1) * 2.0/part - 1.0, 0), (ux + vx).normalize() ) * traceUI->getApertureSize() * 0.1;
-        
-        
-        
-    //     r = ray( new_eye, (focus_pt - new_eye).normalize() );
-    // }
-
-    // std::cout << eye << endl;
-    // std::cout << new_eye << endl;
-
+    r = ray( eye, dir.normalize());
 }
 
 void
