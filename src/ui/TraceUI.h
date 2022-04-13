@@ -36,6 +36,8 @@ public:
 	Fl_Slider*			m_supPixelSlider;
 	Fl_Slider*			m_focalLengthSlider;
 	Fl_Slider*			m_apertureSizeSlider;
+	Fl_Slider*			m_noiseInputSlider;
+	Fl_Slider*			m_noiseScaleSlider;
 
 	Fl_Light_Button*	m_SuperSampButton;
 	Fl_Light_Button*	m_AdaptSupperButton;
@@ -48,9 +50,11 @@ public:
 	Fl_Light_Button*	m_softShadowButton;
 	Fl_Light_Button*	m_motionButton;
 	Fl_Light_Button*	m_aabbButton;
+	Fl_Light_Button*	m_noiseTextureButton;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
+	Fl_Button*			m_calNoiseButton;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -63,6 +67,8 @@ public:
 	int			getDepth();
 	int			getSupPixel() { return m_nSupPixel; }
 	int			getApertureSize() { return m_nApertureSize; }
+	int			getNoiseInput() { return m_nNoiseInput; }
+	int			getNoiseScale() { return m_nNoiseScale; }
 
 	float		getConstant() { return m_fConstant; }
 	float		getLinear() { return m_fLinear; }
@@ -82,6 +88,7 @@ public:
 	bool		getSoftShadow() { return m_bSoftShadow; }
 	bool		getMotion() { return m_bMotion; }
 	bool		getAABBB() { return m_bAABB; }
+	bool		getNoiseTexture() { return m_bNoiseTexture; }
 
 private:
 	RayTracer*	raytracer;
@@ -90,6 +97,8 @@ private:
 	int			m_nDepth;
 	int			m_nSupPixel;
 	int			m_nApertureSize;
+	int			m_nNoiseInput;
+	int			m_nNoiseScale;
 
 	float		m_fConstant;
 	float		m_fLinear;
@@ -109,6 +118,7 @@ private:
 	bool		m_bSoftShadow;
 	bool		m_bMotion;
 	bool		m_bAABB;
+	bool		m_bNoiseTexture;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -150,6 +160,11 @@ private:
 	static void cb_apertureSizeSlider(Fl_Widget* o, void* v);
 
 	static void cb_aabbButton(Fl_Widget* o, void* v);
+
+	static void cb_noiseInputSlider(Fl_Widget* o, void* v);
+	static void cb_noiseScaleSlider(Fl_Widget* o, void* v);
+	static void cb_noiseTextureButton(Fl_Widget* o, void* v);
+	static void cb_generateNoiseButton(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

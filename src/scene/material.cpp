@@ -2,6 +2,10 @@
 #include "material.h"
 #include "light.h"
 
+#include "../RayTracer.h"
+
+extern RayTracer* theRayTracer;
+
 // Apply the phong model to this point on the surface of the object, returning
 // the color of that point.
 vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
@@ -30,12 +34,50 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	{
 		diffuse = kd;
 	}
+	else if (traceUI->getNoiseTexture())
+	{
+		int size = theRayTracer->getNoiseSize();
+		double u = i.u * size, v = i.v * size;
+		int u0 = floor(u), u1 = ceil(u), v0 = floor(v), v1 = ceil(v);
+
+		unsigned char* noise = theRayTracer->getNoiseTexture();
+		int A = noise[v0 * size + u0];
+		int B = noise[v0 * size + u1];
+		int C = noise[v1 * size + u0];
+		int D = noise[v1 * size + u1];
+
+		double AB = A + (u - u0) * (B - A);
+		double CD = C + (u - u0) * (D - C);
+
+		double d = AB + (v - v0) * (CD - AB);
+		d /= 255.0;
+		diffuse = vec3f(d, d, d);
+	}
 	else
 	{
-		int v = min(int(round(i.v * height)), height - 1), u = min(int(round(i.u * width)), width - 1);
-		int a = (v * width + u) * 3;
-		unsigned char* d = &map[a];
-		diffuse = vec3f(d[0]/255.0, d[1]/255.0, d[2]/255.0);
+		double u = i.u * width, v = i.v * height;
+		int u0 = min(floor(u), width - 1), u1 = min(ceil(u), width - 1);
+		int v0 = min(floor(v), height - 1), v1 = min(ceil(v), height - 1);
+
+		int a = (v0 * width + u0) * 3;
+		int b = (v0 * width + u1) * 3;
+		int c = (v1 * width + u0) * 3;
+		int d = (v1 * width + u1) * 3;
+
+		unsigned char* aa = &map[a];
+		unsigned char* bb = &map[b];
+		unsigned char* cc = &map[c];
+		unsigned char* dd = &map[d];
+
+		vec3f A(aa[0] / 255.0, aa[1] / 255.0, aa[2] / 255.0);
+		vec3f B(bb[0] / 255.0, bb[1] / 255.0, bb[2] / 255.0);
+		vec3f C(cc[0] / 255.0, cc[1] / 255.0, cc[2] / 255.0);
+		vec3f D(dd[0] / 255.0, dd[1] / 255.0, dd[2] / 255.0);
+
+		vec3f AB = A + (u - u0) * (B - A);
+		vec3f CD = C + (u - u0) * (D - C);
+
+		diffuse = AB + (v - v0) * (CD - AB);
 	}
 
 	// ambient

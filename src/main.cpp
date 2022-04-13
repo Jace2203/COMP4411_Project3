@@ -68,6 +68,8 @@
 
 #include "fileio/bitmap.h"
 
+#include "PerlinNoise.h"
+
 // ***********************************************************
 // from getopt.cpp 
 // it should be put in an include file.
@@ -151,6 +153,7 @@ bool processArgs(int argc, char **argv) {
 // event handling overhead.
 int main(int argc, char **argv) {
 	progname=argv[0];
+	PerlinNoise::GetInstance();
 
 	if (argc!=1) {
 		// text mode

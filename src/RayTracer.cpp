@@ -11,6 +11,8 @@
 
 #include "ui/TraceUI.h"
 
+#include "PerlinNoise.h"
+
 extern TraceUI* traceUI;
 
 // Trace a top-level ray through normalized window coordinates (x,y)
@@ -114,6 +116,9 @@ RayTracer::RayTracer()
 	scene = NULL;
 
 	m_bSceneLoaded = false;
+
+	m_nNoiseSize = 0;
+	m_dNoiseTexture = nullptr;
 }
 
 
@@ -121,6 +126,7 @@ RayTracer::~RayTracer()
 {
 	delete [] buffer;
 	delete scene;
+	delete [] m_dNoiseTexture;
 }
 
 void RayTracer::getBuffer( unsigned char *&buf, int &w, int &h )
@@ -216,6 +222,27 @@ void RayTracer::tracePixel( int i, int j )
 	pixel[0] = (int)( 255.0 * col[0]);
 	pixel[1] = (int)( 255.0 * col[1]);
 	pixel[2] = (int)( 255.0 * col[2]);
+}
+
+void RayTracer::setNoiseTexture()
+{
+	if (m_dNoiseTexture)
+		delete[] m_dNoiseTexture;
+
+	int size = pow(2, traceUI->getNoiseInput());
+	int scale = traceUI->getNoiseScale();
+	m_nNoiseSize = size * scale;
+	m_dNoiseTexture = PerlinNoise::GenerateNoise2D(size, 1, scale);
+}
+
+unsigned char* RayTracer::getNoiseTexture()
+{
+	return m_dNoiseTexture;
+}
+
+int RayTracer::getNoiseSize()
+{
+	return m_nNoiseSize;
 }
 
 vec3f RayTracer::AdaptSampling(double x, double y, int depth)
