@@ -22,11 +22,10 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 	ray r( vec3f(0,0,0), vec3f(0,0,0) );
 	scene->getCamera()->rayThrough( x,y,r );
 
-	if (!traceUI->getDOF())
+	if (!traceUI->getDOF() && !traceUI->getMotion())
 		return traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 
 	vec3f res(0, 0, 0);
-	int a = 5;
 
 	vec3f dir(r.getDirection());
 	vec3f u = dir.cross(vec3f(1, 0, 0));
@@ -34,23 +33,64 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 	vec3f v = dir.cross(u);
 
 	vec3f eye(r.getPosition());
-	vec3f focus_pt = eye + dir * traceUI->getFocalLength();
 
-	for(int i = 0; i < a; ++i)
+	if (traceUI->getMotion())
 	{
-		srand(time(NULL) + i);
+		int a = 10;
 
-		for(int y = 0; y < 4; ++y)
-			for(int x = 0; x < 4; ++x)
+		for(int i = 0; i < a; ++i)
+		{
+			srand(time(NULL) + i);
+			// double offx = rand() % 11;
+			// double offy = rand() % 11;
+			double offx = 0.5;
+			double offy = 0.5;		
+
+			if (i < a-1)
 			{
-				vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
-				vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.1;
-				r = ray( new_eye, (focus_pt - new_eye).normalize() );
+				for(int y = 0; y < 4; ++y)
+					for(int x = 0; x < 4; ++x)
+					{
+						vec3f offset(vec3f(vec3f(offx * 0.1 + x, offy * 0.1 + y, 0) / 2 - vec3f(1, 1, 0)));
+						//vec3f new_eye = eye + prod(offset, (u + v).normalize()) + i * u * 1 / a;
+						vec3f new_eye = eye + prod(offset, (u + v).normalize()) * 0.07 + (-u - v) * i * 0.7 / a;
+						r = ray( new_eye, dir );
+						res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
+					}
+			}
+			else
+			{
+				vec3f new_eye = eye + (-u - v) * i * 0.7 / a;
+				r = ray( eye, dir );
 				res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 			}
+		}
+
+		return res / 16 / a;
 	}
 
-	return res / 16 / a;
+	if (traceUI->getDOF())
+	{
+		int a = 5;
+
+		vec3f focus_pt = eye + dir * traceUI->getFocalLength();
+
+		for(int i = 0; i < a; ++i)
+		{
+			srand(time(NULL) + i);
+
+			for(int y = 0; y < 4; ++y)
+				for(int x = 0; x < 4; ++x)
+				{
+					vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+					vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.1;
+					r = ray( new_eye, (focus_pt - new_eye).normalize() );
+					res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
+				}
+		}
+
+		return res / 16 / a;
+	}
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
