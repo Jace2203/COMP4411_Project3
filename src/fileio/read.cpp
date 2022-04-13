@@ -20,6 +20,7 @@
 #include "../SceneObjects/Sphere.h"
 #include "../SceneObjects/Square.h"
 #include "../SceneObjects/Torus.h"
+#include "../SceneObjects/Paraboloid.h"
 #include "../scene/light.h"
 
 typedef map<string,Material*> mmap;
@@ -327,10 +328,22 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 			double radius = 1.0;
 			double ring_radius = 1.0;
 
-			maybeExtractField( child, "radius", radius);
-			maybeExtractField( child, "ring_radius", ring_radius);
+			maybeExtractField( child, "radius", radius );
+			maybeExtractField( child, "ring_radius", ring_radius );
 
 			obj = new Torus( scene, mat, radius, ring_radius );
+		} else if ( name == "paraboloid" ) {
+			double A = 1.0;
+			double B = 1.0;
+			double lb = 0.0;
+			double ub = 1.0;
+
+			maybeExtractField( child, "A", A );
+			maybeExtractField( child, "B", B );
+			maybeExtractField( child, "lower_bound", lb );
+			maybeExtractField( child, "upper_bound", ub );
+
+			obj = new Paraboloid( scene, mat, A, B, lb, ub );
 		}
 
         obj->setTransform(transform);
@@ -570,6 +583,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 				name == "cone" ||
 				name == "square" ||
 				name == "torus" ||
+				name == "paraboloid" ||
 				name == "translate" ||
 				name == "rotate" ||
 				name == "scale" ||

@@ -135,6 +135,9 @@
     <ClCompile Include="src\SceneObjects\Torus.cpp">
       <Filter>Source Files\SceneObjects</Filter>
     </ClCompile>
+    <ClCompile Include="src\SceneObjects\Paraboloid.cpp">
+      <Filter>Source Files\SceneObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\RayTracer.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files\vendor\Quartic</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneObjects\Torus.h">
+      <Filter>Header Files\SceneObjects.</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneObjects\Paraboloid.h">
       <Filter>Header Files\SceneObjects.</Filter>
     </ClInclude>
   </ItemGroup>
