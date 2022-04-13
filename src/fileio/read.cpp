@@ -584,6 +584,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 				name == "square" ||
 				name == "torus" ||
 				name == "paraboloid" ||
+				name == "csg" ||
 				name == "translate" ||
 				name == "rotate" ||
 				name == "scale" ||
