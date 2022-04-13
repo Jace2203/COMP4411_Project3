@@ -1,0 +1,41 @@
+SBT-raytracer 1.0
+
+// cyl_cyl_refract.ray
+// Test the refraction term
+// Don't forget to increase the trace depth to >= 2!
+
+camera
+{
+	position = (0, 5, -2);
+	viewdir = (0, -5, 2);
+	updir = (0, 1, 0);
+}
+
+point_light
+{
+	position = (0, 0, 0);
+	color = (1.0, 1.0, 1.0);
+}
+
+directional_light
+{
+    direction = (0,-3,);
+	colour = (1.0, 1.0, 1.0);
+}
+
+// directional_light
+// {
+//     direction = (1,-3,1);
+// 	colour = (1.0, 1.0, 1.0);
+// }
+
+scale(0.5,0.5,0.5,
+torus {
+	radius = 0.9;
+	ring_radius = 0.3;
+	material = {
+		specular = (0.8, 0.3, 0.5);
+		diffuse = (1.0, 0.5, 0.7);
+		ambient = (0.05, 0.05, 0.05);
+	}
+})
