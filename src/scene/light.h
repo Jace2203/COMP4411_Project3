@@ -75,4 +75,23 @@ protected:
 	double cutoff;
 };
 
+class WarnLight
+	: public Light
+{
+public:
+	WarnLight( Scene *scene, const vec3f& pos, const vec3f& color, const vec3f& dir, const vec3f& edgeplace, const vec3f& min_flap, const vec3f& max_flap)
+		: Light( scene, color ), position( pos ), direction(dir.normalize()), min_flap(min_flap), max_flap(max_flap), cutoff(cos(edgeplace[0] * 3.1415926535 / 180)) {}
+	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual double distanceAttenuation( const vec3f& P ) const;
+	virtual vec3f getColor( const vec3f& P ) const;
+	virtual vec3f getDirection( const vec3f& P ) const;
+
+protected:
+	vec3f position;
+	vec3f direction;
+	vec3f min_flap;
+	vec3f max_flap;
+	double cutoff;
+};
+
 #endif // __LIGHT_H__
