@@ -229,11 +229,13 @@ void RayTracer::setNoiseTexture()
 	if (m_dNoiseTexture)
 		delete[] m_dNoiseTexture;
 
-	m_nNoiseSize = pow(2, traceUI->getNoiseInput());
-	m_dNoiseTexture = PerlinNoise::GenerateNoise2D(m_nNoiseSize, 1, traceUI->getNoiseScale());
+	int size = pow(2, traceUI->getNoiseInput());
+	int scale = traceUI->getNoiseScale();
+	m_nNoiseSize = size * scale;
+	m_dNoiseTexture = PerlinNoise::GenerateNoise2D(size, 1, scale);
 }
 
-double* RayTracer::getNoiseTexture()
+unsigned char* RayTracer::getNoiseTexture()
 {
 	return m_dNoiseTexture;
 }

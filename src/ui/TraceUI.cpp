@@ -378,7 +378,7 @@ TraceUI::TraceUI() {
 
 	m_bAABB = false;
 
-	m_nNoiseInput = 8;
+	m_nNoiseInput = 3;
 	m_nNoiseScale = 1;
 	m_bNoiseTexture = false;
 
@@ -581,8 +581,8 @@ TraceUI::TraceUI() {
 		m_noiseInputSlider->type(FL_HOR_NICE_SLIDER);
         m_noiseInputSlider->labelfont(FL_COURIER);
         m_noiseInputSlider->labelsize(12);
-		m_noiseInputSlider->minimum(8);
-		m_noiseInputSlider->maximum(12);
+		m_noiseInputSlider->minimum(3);
+		m_noiseInputSlider->maximum(10);
 		m_noiseInputSlider->step(1);
 		m_noiseInputSlider->value(m_nNoiseInput);
 		m_noiseInputSlider->align(FL_ALIGN_RIGHT);
@@ -594,7 +594,7 @@ TraceUI::TraceUI() {
         m_noiseScaleSlider->labelfont(FL_COURIER);
         m_noiseScaleSlider->labelsize(12);
 		m_noiseScaleSlider->minimum(1);
-		m_noiseScaleSlider->maximum(32);
+		m_noiseScaleSlider->maximum(5);
 		m_noiseScaleSlider->step(1);
 		m_noiseScaleSlider->value(m_nNoiseScale);
 		m_noiseScaleSlider->align(FL_ALIGN_RIGHT);

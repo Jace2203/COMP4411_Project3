@@ -26,7 +26,7 @@ public:
 	bool sceneLoaded();
 
 	void setNoiseTexture();
-	double* getNoiseTexture();
+	unsigned char* getNoiseTexture();
 	int getNoiseSize();
 private:
 	unsigned char *buffer;
@@ -37,7 +37,7 @@ private:
 	bool m_bSceneLoaded;
 
 	int m_nNoiseSize;
-	double* m_dNoiseTexture;
+	unsigned char* m_dNoiseTexture;
 
 	vec3f AdaptSampling(double x, double y, int depth);
 	vec3f AdaptSampling(double x, double y, int depth, int a, int b, int c, int d, int division, vec3f*** cache);

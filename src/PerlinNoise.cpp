@@ -25,40 +25,38 @@ PerlinNoise* PerlinNoise::GetInstance()
     return instance;
 }
 
-double* PerlinNoise::GenerateNoise2D(int size, int octave, int scale)
+unsigned char* PerlinNoise::GenerateNoise2D(int size, int octave, int scale)
 {
-    scale += 1;
-    vec3f* grad = new vec3f[scale * scale];
-    for (int i = 0; i < scale * scale; i++)
+    vec3f* grad = new vec3f[(size + 1) * (size + 1)];
+    for (int i = 0; i < (size + 1) * (size + 1); i++)
     {
         double theta = double(rand()) / RAND_MAX * M_PI * 2;
         grad[i] = vec3f(cos(theta) * 1, sin(theta) * 1, 0.0);
     }
 
-    double* result = new double[size * size];
+    unsigned char* result = new unsigned char[size * size * scale * scale];
 
     for (int y = 0; y < size; y++)
     {
         for (int x = 0; x < size; x++)
         {
-            double xx = (double)x / size * scale;
-            double yy = (double)y / size * scale;
+            for (int j = 0; j < scale; j++)
+            {
+                for (int i = 0; i < scale; i++)
+                {
+                    vec3f pos(float(i)/scale, float(j)/scale, 0.0);
+                    double A = (pos - vec3f(0.0, 0.0, 0.0)).dot(grad[y * size + x]);
+                    double B = (pos - vec3f(1.0, 0.0, 0.0)).dot(grad[y * size + x + 1]);
+                    double C = (pos - vec3f(0.0, 1.0, 0.0)).dot(grad[(y + 1) * size + x]);
+                    double D = (pos - vec3f(1.0, 1.0, 0.0)).dot(grad[(y + 1) * size + x + 1]);
 
-            int x0 = floor(xx);
-            int x1 = ceil(xx);
-            int y0 = floor(yy);
-            int y1 = ceil(yy);
+                    double AB = A + pos[0] * (B - A);
+                    double CD = C + pos[0] * (D - C);
 
-            double A = vec3f(xx - x0, yy - y0, 0.0).dot(grad[y0 * scale + x0]);
-            double B = vec3f(xx - x1, yy - y0, 0.0).dot(grad[y0 * scale + x1]);
-            double C = vec3f(xx - x0, yy - y1, 0.0).dot(grad[y1 * scale + x0]);
-            double D = vec3f(xx - x1, yy - y1, 0.0).dot(grad[y1 * scale + x1]);
-
-            double AB = A + (xx - x0) * (B - A);
-            double CD = C + (xx - x0) * (D - C);
-
-            double v = AB + (yy - y0) * (CD - AB);
-            result[y * size + x] = fade((v + 1)/2);
+                    double v = AB + pos[1] * (CD - AB);
+                    result[(y * scale + j) * scale * size + (x * scale + i)] = fade((v + 1)/2) * 255;
+                }
+            }
         }
     }
 

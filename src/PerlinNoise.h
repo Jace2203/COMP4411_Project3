@@ -6,7 +6,7 @@ class PerlinNoise
 public:
     static PerlinNoise* GetInstance();
 
-    static double* GenerateNoise2D(int size, int octave, int scale);
+    static unsigned char* GenerateNoise2D(int size, int octave, int scale);
 
 private:
     PerlinNoise();
