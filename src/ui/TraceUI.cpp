@@ -523,7 +523,7 @@ TraceUI::TraceUI() {
 		m_bumpMappingButton = new Fl_Light_Button(220, 260, 120, 25,"&Bump mapping");
 		m_bumpMappingButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_bumpMappingButton->callback(cb_bumpMappingButton);
-		m_bumpMappingButton->deactivate();
+		// m_bumpMappingButton->deactivate();
 
 		// install lightbutton DOP
 		m_DOFButton = new Fl_Light_Button(10, 290, 60, 25,"&DOF");

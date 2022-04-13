@@ -3,8 +3,10 @@
 #include "light.h"
 
 #include "../RayTracer.h"
+#include "../ui/TraceUI.h"
 
 extern RayTracer* theRayTracer;
+extern TraceUI* traceUI;
 
 // Apply the phong model to this point on the surface of the object, returning
 // the color of that point.
@@ -24,6 +26,7 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 	vec3f V = r.getDirection().normalize();
 	vec3f P = r.at(i.t);
+	vec3f N = i.N;
 
 	// emissive
 	vec3f result = ke + prod(ka, scene->ambient_Light);
@@ -34,50 +37,70 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	{
 		diffuse = kd;
 	}
-	else if (traceUI->getNoiseTexture())
-	{
-		int size = theRayTracer->getNoiseSize();
-		double u = i.u * size, v = i.v * size;
-		int u0 = floor(u), u1 = ceil(u), v0 = floor(v), v1 = ceil(v);
-
-		unsigned char* noise = theRayTracer->getNoiseTexture();
-		int A = noise[v0 * size + u0];
-		int B = noise[v0 * size + u1];
-		int C = noise[v1 * size + u0];
-		int D = noise[v1 * size + u1];
-
-		double AB = A + (u - u0) * (B - A);
-		double CD = C + (u - u0) * (D - C);
-
-		double d = AB + (v - v0) * (CD - AB);
-		d /= 255.0;
-		diffuse = vec3f(d, d, d);
-	}
 	else
 	{
-		double u = i.u * width, v = i.v * height;
-		int u0 = min(floor(u), width - 1), u1 = min(ceil(u), width - 1);
-		int v0 = min(floor(v), height - 1), v1 = min(ceil(v), height - 1);
+		if (traceUI->getNoiseTexture())
+		{
+			int size = theRayTracer->getNoiseSize();
+			double u = i.u * size, v = i.v * size;
+			int u0 = floor(u), u1 = ceil(u), v0 = floor(v), v1 = ceil(v);
 
-		int a = (v0 * width + u0) * 3;
-		int b = (v0 * width + u1) * 3;
-		int c = (v1 * width + u0) * 3;
-		int d = (v1 * width + u1) * 3;
+			unsigned char* noise = theRayTracer->getNoiseTexture();
+			int A = noise[v0 * size + u0];
+			int B = noise[v0 * size + u1];
+			int C = noise[v1 * size + u0];
+			int D = noise[v1 * size + u1];
 
-		unsigned char* aa = &map[a];
-		unsigned char* bb = &map[b];
-		unsigned char* cc = &map[c];
-		unsigned char* dd = &map[d];
+			double AB = A + (u - u0) * (B - A);
+			double CD = C + (u - u0) * (D - C);
 
-		vec3f A(aa[0] / 255.0, aa[1] / 255.0, aa[2] / 255.0);
-		vec3f B(bb[0] / 255.0, bb[1] / 255.0, bb[2] / 255.0);
-		vec3f C(cc[0] / 255.0, cc[1] / 255.0, cc[2] / 255.0);
-		vec3f D(dd[0] / 255.0, dd[1] / 255.0, dd[2] / 255.0);
+			double d = AB + (v - v0) * (CD - AB);
+			d /= 255.0;
+			diffuse = vec3f(d, d, d);
+		}
+		else
+		{
+			double u = i.u * width, v = i.v * height;
+			int u0 = min(floor(u), width - 1), u1 = min(ceil(u), width - 1);
+			int v0 = min(floor(v), height - 1), v1 = min(ceil(v), height - 1);
 
-		vec3f AB = A + (u - u0) * (B - A);
-		vec3f CD = C + (u - u0) * (D - C);
+			int a = (v0 * width + u0) * 3;
+			int b = (v0 * width + u1) * 3;
+			int c = (v1 * width + u0) * 3;
+			int d = (v1 * width + u1) * 3;
 
-		diffuse = AB + (v - v0) * (CD - AB);
+			unsigned char* aa = &map[a];
+			unsigned char* bb = &map[b];
+			unsigned char* cc = &map[c];
+			unsigned char* dd = &map[d];
+
+			vec3f A(aa[0] / 255.0, aa[1] / 255.0, aa[2] / 255.0);
+			vec3f B(bb[0] / 255.0, bb[1] / 255.0, bb[2] / 255.0);
+			vec3f C(cc[0] / 255.0, cc[1] / 255.0, cc[2] / 255.0);
+			vec3f D(dd[0] / 255.0, dd[1] / 255.0, dd[2] / 255.0);
+
+			vec3f AB = A + (u - u0) * (B - A);
+			vec3f CD = C + (u - u0) * (D - C);
+
+			diffuse = AB + (v - v0) * (CD - AB);
+		}
+		
+		if (traceUI->getBumpMapping())
+		{
+			int uu = min(u + 1, width - 1), vv = min(v + 1, height - 1);
+			unsigned char* r_map = &map[(v * width + uu) * 3];
+			unsigned char* g_map = &map[(vv * width + u) * 3];
+			vec3f NN = (N + vec3f(0.0, 1.0, 0.0)).normalize();
+			if (abs((NN - N).length_squared()) < NORMAL_EPSILON)
+			{
+				NN = (N + vec3f(1.0, 0.0, 0.0)).normalize();
+			}
+
+			vec3f U = NN.cross(N).normalize() * 50.0;
+			vec3f V = N.cross(U).normalize() * 50.0;
+			double dr = (d[0] - r_map[0]) / 255.0, dg = (d[1] - g_map[1]) / 255.0;
+			N = (N + U * dr + V * dg).normalize();
+		}
 	}
 
 	// ambient
@@ -85,12 +108,12 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	{
 		vec3f I((*it)->getColor(P));
 		vec3f L((*it)->getDirection(P));
-		vec3f R(ray::reflect(L, i.N).normalize());
+		vec3f R(ray::reflect(L, N).normalize());
 
 		vec3f atten((*it)->shadowAttenuation(P) * (*it)->distanceAttenuation(P));
 
 		// diffuse
-		vec3f d = diffuse * max(i.N.normalize() * L.normalize(), 0.0);
+		vec3f d = diffuse * max(N.normalize() * L.normalize(), 0.0);
 
 		// specular
 		vec3f specular(ks * pow(max(R.dot(V), 0.0), shininess * 128));
