@@ -68,13 +68,14 @@ vec3f PointLight::getDirection( const vec3f& P ) const
 
 vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
+	isect i;
+
 	if (traceUI->getSoftShadow())
 	{
 		vec3f u(getDirection(P).cross(vec3f(1, 0, 0)).normalize());
 		if (u.iszero()) u = (getDirection(P).cross(vec3f(0, 1, 0)).normalize());
 		vec3f v(getDirection(P).cross(u).normalize());
 
-		isect i;
 		vec3f res(1, 1, 1);
 
 		for(int y = 0; y < 4; ++y)
@@ -87,12 +88,23 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 					res -= res / 16;
 			}
 
+		for(int y = 0; y < 4; ++y)
+			for(int x = 0; x < 4; ++x)
+			{
+				vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+				vec3f pt = position + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.2;
+				ray shadow(P + RAY_EPSILON * (pt - P).normalize(), (pt - P).normalize());
+				if (scene->intersect(shadow, i))
+					res -= res / 16;
+			}
+		
 		return res;
 	}
 	else
 	{
+		
+
 		ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
-		isect i;
 
 		if (scene->intersect(shadow, i))
 			return i.getMaterial().kt;

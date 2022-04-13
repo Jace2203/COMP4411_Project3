@@ -84,19 +84,27 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
-			vec3f u(i.N.cross(vec3f(1, 0, 0)).normalize());
-			if (u.iszero()) u = i.N.cross(vec3f(0, 1, 0));
-			vec3f v(i.N.cross(u).normalize());
+			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
 
-			int a = (traceUI->getGlossy()) ? 2 : 0; // time = (2x + 1)^2
+			if (!traceUI->getGlossy())
+				refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1).clamp();
+			else
+			{
+				vec3f u(reflect.cross(vec3f(1, 0, 0)).normalize());
+				if (u.iszero()) u = reflect.cross(vec3f(0, 1, 0)).normalize();
+				vec3f v(reflect.cross(u).normalize());
 
-			for(int x = -a; x <= a; ++x)
-				for(int y = -a; y <= a; ++y)
-				{
-					vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
-					reflect += (x * u + y * v) * 0.02;
-					refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1).clamp() / pow(2 * a + 1, 2);
-				}
+				for(int y = 0; y < 4; ++y)
+					for(int x = 0; x < 4; ++x)
+					{
+						srand(time(NULL) + x + y);
+						vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.05;
+						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), thresh, depth - 1).clamp();
+					}
+
+				refl /= 16;
+			}
 		}
 
 		if (m.index != 1 && m.kt.length() >= thresh.length())
