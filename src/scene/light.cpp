@@ -141,3 +141,38 @@ vec3f SpotLight::shadowAttenuation(const vec3f& P) const
 
     return vec3f(1, 1, 1);
 }
+
+double WarnLight::distanceAttenuation( const vec3f& P ) const
+{
+	// std::cout << P << endl;
+
+	if (min_flap[0] <= P[0] && P[0] <= max_flap[0])
+		if (min_flap[1] <= P[1] && P[1] <= max_flap[1])
+			if (min_flap[2] <= P[2] && P[2] <= max_flap[2])
+				if (direction.dot(-getDirection(P)) >= cutoff)
+					return 1.0;
+
+	return 0.0;
+}
+
+vec3f WarnLight::getColor( const vec3f& P ) const
+{
+	return color;
+}
+
+vec3f WarnLight::getDirection( const vec3f& P ) const
+{
+	//std::cout << (position - P).normalize() << endl;
+	return (position - P).normalize();
+}
+
+vec3f WarnLight::shadowAttenuation(const vec3f& P) const
+{
+	ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
+	isect i;
+
+	if (scene->intersect(shadow, i))
+		return i.getMaterial().kt;
+
+    return vec3f(1, 1, 1);
+}

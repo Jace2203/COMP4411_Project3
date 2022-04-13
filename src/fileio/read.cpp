@@ -563,6 +563,18 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec( getField( child, "colour" ) ),
 			tupleToVec( getField( child, "direction" ) ),
 			tupleToVec( getField( child, "edgeplace" ) ) ) );
+	} else if( name == "warn_light" ) {
+		if( child == NULL ) {
+			throw ParseError( "No info for directional_light" );
+		}
+
+		scene->add( new WarnLight( scene, 
+			tupleToVec( getField( child, "position" ) ),
+			tupleToVec( getField( child, "colour" ) ),
+			tupleToVec( getField( child, "direction" ) ),
+			tupleToVec( getField( child, "edgeplace" ) ),
+			tupleToVec( getField( child, "min_flap" ) ),
+			tupleToVec( getField( child, "max_flap" ) ) ) );
 	} else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
