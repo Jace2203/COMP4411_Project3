@@ -230,28 +230,6 @@ static Obj *readDict( istream& is )
 	}
 }
 
-static Obj* readMap( istream& is )
-{
-	string path;
-	is.get();
-	is.get();
-	is.get();
-	while ( true ) {
-		eat( is );
-		int ch = is.get();
-		if ( ch == ')') {
-			path = "texture/" + path;
-			return new MapObj(path);
-		} else if ( ch == '(' || ch == '"') {
-			continue;
-		} else if ( (ch >= 'a' && ch <='z') || (ch >= 'A' && ch <='Z') || (ch == '.')) {
-			path += ch;
-		} else {
-			throw ParseError( "Parse error: expected character." );
-		}
-	}
-}
-
 static Obj *readObject( istream& is )
 {
 	if( !eat( is ) ) {
@@ -268,8 +246,6 @@ static Obj *readObject( istream& is )
 		return readTuple( is );
 	} else if( ch == '{' ) {
 		return readDict( is );
-	} else if( ch == 'm' ) {
-		return readMap( is );
 	} else {
 		return readName( is );
 	}

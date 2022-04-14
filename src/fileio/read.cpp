@@ -164,6 +164,12 @@ static vec3f tupleToVec( Obj *obj )
 	return vec3f( t[0]->getScalar(), t[1]->getScalar(), t[2]->getScalar() );
 }
 
+static MapObj* stringToMap( Obj *obj )
+{
+	MapObj* m = new MapObj("texture/" + obj->getString());
+	return m;
+}
+
 static void processGeometry( Obj *obj, Scene *scene,
 	const mmap& materials, TransformNode *transform )
 {
@@ -344,6 +350,10 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 			maybeExtractField( child, "upper_bound", ub );
 
 			obj = new Paraboloid( scene, mat, A, B, lb, ub );
+		} else if( name == "csg" ) {
+			double num = 0;
+			maybeExtractField( child, "primitiveNumber", num);
+			std::cout << num << std::endl;
 		}
 
         obj->setTransform(transform);
@@ -454,9 +464,15 @@ static Material *processMaterial( Obj *child, mmap *bindings )
     if( hasField( child, "diffuse" ) ) {
 		Obj* diffuse = getField( child, "diffuse");
 		if (diffuse->getTypeName() == string("tuple"))
+		{
 			mat->kd = tupleToVec(diffuse);
+		}
 		else
-			diffuse->getMap(mat->map, mat->width, mat->height);
+		{
+			MapObj* m = stringToMap(diffuse);
+			m->getMap(mat->map, mat->width, mat->height);
+			delete m;
+		}
     }
     if( hasField( child, "reflective" ) ) {
         mat->kr = tupleToVec( getField( child, "reflective" ) );

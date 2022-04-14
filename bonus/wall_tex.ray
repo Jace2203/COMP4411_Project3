@@ -19,7 +19,7 @@ point_light
 scale(3.2,2.3,1.0,
 	square {
   		material = {
-   		diffuse = map("wall.bmp");
+   		diffuse = "wall.bmp";
   		}
 	}
 )
