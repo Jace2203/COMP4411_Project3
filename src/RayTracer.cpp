@@ -8,6 +8,7 @@
 #include "scene/ray.h"
 #include "fileio/read.h"
 #include "fileio/parse.h"
+#include "SceneObjects/trimesh.h"
 
 #include "ui/TraceUI.h"
 
@@ -173,7 +174,6 @@ RayTracer::RayTracer()
 	m_bSceneLoaded = false;
 }
 
-
 RayTracer::~RayTracer()
 {
 	delete [] buffer;
@@ -226,6 +226,97 @@ bool RayTracer::loadScene( char* fn )
 	m_bSceneLoaded = true;
 
 	return true;
+}
+
+void RayTracer::loadHField(unsigned char *data, unsigned char *grey, int width, int height)
+{
+	// std::cout << sceneLoaded() << endl;
+
+	// std::cout << '1' << endl;
+
+	// std::cout << width << endl;
+	// std::cout << height << endl;
+
+	Material *mat = new Material();
+	mat->kd = vec3f(1, 0, 0);
+
+ 	Trimesh *tmesh = new Trimesh( scene, mat, &scene->transformRoot);
+
+    // tmesh->addVertex( vec3f(0,0,0)); 
+    // tmesh->addVertex( vec3f(0,1,0)); 
+    // tmesh->addVertex( vec3f(0,1,1)); 
+    // tmesh->addVertex( vec3f(0,0,1));
+    // tmesh->addVertex( vec3f(1,0,0)); 
+    // tmesh->addVertex( vec3f(1,1,0)); 
+    // tmesh->addVertex( vec3f(1,1,1)); 
+    // tmesh->addVertex( vec3f(1,0,1));
+	
+    // tmesh->addFace(2,3,7); 
+    // tmesh->addFace(1,5,4); 
+    // tmesh->addFace(2,1,0);
+    // tmesh->addFace(6,7,4); 
+    // tmesh->addFace(2,6,5); 
+    // tmesh->addFace(3,0,4);
+
+	// Material *mt = new Material();
+    // mt->kd = vec3f(1,0,0);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(0,1,0);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(0.3,0.2,0); 
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(0,1,0);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(1,0,0);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(1,1,0);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(0.4,0.3,0.3);
+	// tmesh->addMaterial( mt );
+	// mt = new Material();
+    // mt->kd = vec3f(1,0,1);
+	// tmesh->addMaterial( mt );
+	
+	for(int j = 0; j < height; ++j)
+		for(int i = 0; i < width; ++i)
+		{
+			// std::cout << (vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255) << endl;
+			tmesh->addVertex( vec3f( j, -(vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255).length() * 2, i) / 4);
+		}
+			// tmesh->addVertex( vec3f( j, 0, i) / 4);
+
+	std::cout << '2' << endl;
+
+	for(int j = 0; j < height - 1; ++j)
+	{
+		for(int i = 0; i < width - 1; ++i)
+		{
+			tmesh->addFace(i + 1 + (j + 1) * width, i + (j + 1) * width, i + j * width);
+			tmesh->addFace(i + 1 + (j + 1) * width, i + j * width, i + 1 + j * width);
+		}
+		std::cout << j << endl;
+	}
+
+	std::cout << '3' << endl;
+
+	for(int j = 0; j < height; ++j)
+		for(int i = 0; i < width; ++i)
+		{
+			Material *mt = new Material();
+			mt->kd = vec3f(data[(i + j * width) * 3], data[(i + j * width) * 3 + 1], data[(i + j * width) * 3 + 2]) / 255;
+			tmesh->addMaterial( mt );
+		}
+
+	std::cout << '4' << endl;
+
+	// scene->add(tmesh);
+	scene->initScene();
 }
 
 void RayTracer::traceSetup( int w, int h )
@@ -338,3 +429,4 @@ vec3f RayTracer::AdaptSampling(double x, double y, int depth, int a, int b, int 
 
 	return result;
 }
+
