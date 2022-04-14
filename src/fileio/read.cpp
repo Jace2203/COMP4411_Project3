@@ -21,6 +21,7 @@
 #include "../SceneObjects/Square.h"
 #include "../SceneObjects/Torus.h"
 #include "../SceneObjects/Paraboloid.h"
+#include "../SceneObjects/csg.h"
 #include "../scene/light.h"
 
 typedef map<string,Material*> mmap;
@@ -38,6 +39,7 @@ static void processCamera( Obj *child, Scene *scene );
 static Material *getMaterial( Obj *child, const mmap& bindings );
 static Material *processMaterial( Obj *child, mmap *bindings = NULL );
 static void verifyTuple( const mytuple& tup, size_t size );
+static CSGTree* processOperator(const mytuple& tup);
 
 Scene *readScene( const string& filename )
 {
@@ -305,10 +307,10 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 		SceneObject *obj = NULL;
        	Material *mat;
         
-        //if( hasField( child, "material" ) )
-        mat = getMaterial(getField( child, "material" ), materials );
-        //else
-        //    mat = new Material();
+        if( hasField( child, "material" ) )
+			mat = getMaterial(getField( child, "material" ), materials );
+        else
+           mat = new Material();
 
 		if( name == "sphere" ) {
 			obj = new Sphere( scene, mat );
@@ -351,9 +353,58 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 
 			obj = new Paraboloid( scene, mat, A, B, lb, ub );
 		} else if( name == "csg" ) {
-			double num = 0;
-			maybeExtractField( child, "primitiveNumber", num);
-			std::cout << num << std::endl;
+			CSG* csg = new CSG(scene);
+			int num = getField( child, "primitiveNumber" )->getScalar();
+			for (int i = 0; i < num; i++)
+			{
+				std::string index = std::to_string(i);
+				mytuple queue = getField( child, "queue" + index )->getTuple();
+				
+				MaterialSceneObject* o;
+				std::string primitive = getField( child, "primitive" + index )->getString();
+				Material* m = materials.at(getField( child, "materialID" + index )->getString());
+				TransformNode* trans = transform;
+				if (primitive == "box") {
+					o = new Box( scene, mat );
+				} else if (primitive == "sphere") {
+					o = new Sphere( scene, mat );
+				} else if (primitive == "cylinder") {
+					o = new Cylinder( scene, mat );
+				}
+
+				for (auto it = queue.begin(); it != queue.end(); it++)
+				{
+					std::string s = (*it)->getString();
+					if (s == "translate") {
+						vec3f vec = tupleToVec(getField(child, "translate" + index ));
+						trans = trans->createChild(mat4f::translate(vec));
+					} else if (s == "scale") {
+						const mytuple& tup = getField(child, "scale" + index )->getTuple();
+						if( tup.size() == 1 ) {
+							double scale = tup[0]->getScalar();
+							trans = trans->createChild(mat4f::scale(vec3f(scale, scale, scale)));
+						} else if ( tup.size() == 3 ) {
+							vec3f vec = tupleToVec(getField(child, "scale" + index ));
+							trans = trans->createChild(mat4f::scale(vec));
+						}
+					} else if (s == "rotate") {
+						const mytuple& tup = getField(child, "rotate" + index )->getTuple();
+						verifyTuple(tup, 4);
+						trans = trans->createChild(mat4f::rotate(vec3f(	tup[0]->getScalar(),
+																		tup[1]->getScalar(),
+																		tup[2]->getScalar()),
+																 tup[3]->getScalar()));
+					}
+				}
+				o->setTransform(trans);
+				o->setMaterial(m);
+				csg->addPrimitive(o);
+			}
+
+			CSGTree* tree = processOperator(getField(child, "operator" )->getTuple());
+			csg->addCSGTree(tree);
+
+			obj = csg;
 		}
 
         obj->setTransform(transform);
@@ -616,4 +667,31 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 	} else {
 		throw ParseError( string( "Unrecognized object: " ) + name );
 	}
+}
+
+static CSGTree* processOperator(const mytuple& tup)
+{
+	std::string opt_str = tup[1]->getString();
+	OPT opt;
+	if (opt_str == "union")
+		opt = OPT::UNION;
+	else if (opt_str == "intersect")
+		opt = OPT::INTERSECT;
+	else if (opt_str == "difference")
+		opt = OPT::DIFF;
+	else if (opt_str == "minus")
+		opt = OPT::MINUS;
+
+	CSGTree *left, *right;
+	if (tup[0]->getTypeName() == "tuple")
+		left = processOperator(tup[0]->getTuple());
+	else
+		left = new CSGTree(tup[0]->getScalar());
+
+	if (tup[2]->getTypeName() == "tuple")
+		right = processOperator(tup[2]->getTuple());
+	else
+		right = new CSGTree(tup[2]->getScalar());
+
+	return new CSGTree(opt, left, right);
 }
