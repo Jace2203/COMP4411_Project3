@@ -59,9 +59,9 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 			d /= 255.0;
 			diffuse = vec3f(d, d, d);
 			
-			// int uu = min(u + 1, size - 1), vv = min(v + 1, size - 1);
-			// dr = d - (noise[int(v) * width + uu] / 255.0);
-			// dg = d - (noise[vv * width + int(u)] / 255.0);
+			int uu = min(u + 1, size - 1), vv = min(v + 1, size - 1);
+			dr = d - (noise[int(v) * width + uu] / 255.0);
+			dg = d - (noise[vv * width + int(u)] / 255.0);
 		}
 		else
 		{
@@ -92,20 +92,20 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 			int uu = min(u + 1, width - 1), vv = min(v + 1, height - 1);
 			unsigned char* r_map = &map[(int(v) * width + uu) * 3];
 			unsigned char* g_map = &map[(vv * width + int(u)) * 3];
-			double dr = diffuse[0] - (r_map[0] / 255.0), dg = diffuse[1] - (g_map[1] / 255.0);
-			
-			if (traceUI->getBumpMapping())
-			{
-				vec3f NN = (N + vec3f(0.0, 1.0, 0.0)).normalize();
-				if (abs((NN - N).length_squared()) < NORMAL_EPSILON)
-				{
-					NN = (N + vec3f(1.0, 0.0, 0.0)).normalize();
-				}
+			dr = diffuse[0] - (r_map[0] / 255.0), dg = diffuse[1] - (g_map[1] / 255.0);
+		}
 
-				vec3f U = NN.cross(N).normalize() * 50.0;
-				vec3f V = N.cross(U).normalize() * 50.0;
-				N = (N + U * dr + V * dg).normalize();
+		if (traceUI->getBumpMapping())
+		{
+			vec3f NN = (N + vec3f(0.0, 1.0, 0.0)).normalize();
+			if (abs((NN - N).length_squared()) < NORMAL_EPSILON)
+			{
+				NN = (N + vec3f(1.0, 0.0, 0.0)).normalize();
 			}
+
+			vec3f U = NN.cross(N).normalize() * 50.0;
+			vec3f V = N.cross(U).normalize() * 50.0;
+			N = (N + U * dr + V * dg).normalize();
 		}
 	}
 
