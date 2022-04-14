@@ -29,6 +29,6 @@ directional_light
 scale(0.5,0.5,0.5,
 sphere {
 	material = { 
-		diffuse = map("wall.bmp");
+		diffuse = "wall.bmp";
 	}
 })

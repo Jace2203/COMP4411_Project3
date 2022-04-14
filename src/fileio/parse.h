@@ -265,7 +265,9 @@ public:
 		os << ", height=" << height;
 		os << '}';
 	}
-	virtual void getMap(unsigned char*& bmp, int& w, int& h) const { bmp = map; w = width; h = height; }
+	virtual void getMap(unsigned char*& bmp, int& w, int& h) const {
+		bmp = map; w = width; h = height;
+	}
 
 private:
 	string path;
