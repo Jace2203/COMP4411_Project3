@@ -66,10 +66,7 @@ void Tree::InsertLeaf(Geometry* obj)
     Tree* leaf = new Tree();
     leaf->m_Node = leaf_node;
     double best = std::numeric_limits<double>::max();
-
-    std::cout << "in" << endl;
     Tree* target = BestSibling(0, best, leaf_node);
-    std::cout << "out" << endl;
 
     Tree* old_parent = target->m_Parent;
     if (old_parent)
