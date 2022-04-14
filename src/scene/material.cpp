@@ -39,10 +39,11 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	}
 	else
 	{
+		double u = 0.0, v = 0.0, dr = 0.0, dg = 0.0;
 		if (traceUI->getNoiseTexture())
 		{
 			int size = theRayTracer->getNoiseSize();
-			double u = i.u * size, v = i.v * size;
+			u = i.u * size, v = i.v * size;
 			int u0 = floor(u), u1 = ceil(u), v0 = floor(v), v1 = ceil(v);
 
 			unsigned char* noise = theRayTracer->getNoiseTexture();
@@ -57,10 +58,14 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 			double d = AB + (v - v0) * (CD - AB);
 			d /= 255.0;
 			diffuse = vec3f(d, d, d);
+			
+			int uu = min(u + 1, size - 1), vv = min(v + 1, size - 1);
+			dr = d - (noise[int(v) * width + uu] / 255.0);
+			dg = d - (noise[vv * width + int(u)] / 255.0);
 		}
 		else
 		{
-			double u = i.u * width, v = i.v * height;
+			u = i.u * width, v = i.v * height;
 			int u0 = min(floor(u), width - 1), u1 = min(ceil(u), width - 1);
 			int v0 = min(floor(v), height - 1), v1 = min(ceil(v), height - 1);
 
@@ -83,13 +88,15 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 			vec3f CD = C + (u - u0) * (D - C);
 
 			diffuse = AB + (v - v0) * (CD - AB);
+			
+			int uu = min(u + 1, width - 1), vv = min(v + 1, height - 1);
+			unsigned char* r_map = &map[(int(v) * width + uu) * 3];
+			unsigned char* g_map = &map[(vv * width + int(u)) * 3];
+			dr = diffuse[0] - (r_map[0] / 255.0), dg = diffuse[1] - (g_map[1] / 255.0);
 		}
-		
+
 		if (traceUI->getBumpMapping())
 		{
-			int uu = min(u + 1, width - 1), vv = min(v + 1, height - 1);
-			unsigned char* r_map = &map[(v * width + uu) * 3];
-			unsigned char* g_map = &map[(vv * width + u) * 3];
 			vec3f NN = (N + vec3f(0.0, 1.0, 0.0)).normalize();
 			if (abs((NN - N).length_squared()) < NORMAL_EPSILON)
 			{
@@ -98,7 +105,6 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 
 			vec3f U = NN.cross(N).normalize() * 50.0;
 			vec3f V = N.cross(U).normalize() * 50.0;
-			double dr = (d[0] - r_map[0]) / 255.0, dg = (d[1] - g_map[1]) / 255.0;
 			N = (N + U * dr + V * dg).normalize();
 		}
 	}
