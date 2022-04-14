@@ -16,7 +16,7 @@ CSGTree::CSGTree(OPT opt, CSGTree* left, CSGTree* right)
 }
 
 CSG::CSG(Scene* scene)
-    : SceneObject(scene), m_Mat(new Material())
+: SceneObject(scene), m_Mat(new Material()), aabbTree(new Tree())
 {
 }
 
@@ -25,9 +25,12 @@ CSG::~CSG()
     delete m_Mat;
     for (auto it = m_Objs.begin(); it != m_Objs.end(); it++)
         delete *it;
+
+    delete aabbTree;
 }
 
 void CSG::addPrimitive(MaterialSceneObject* obj)
 {
     m_Objs.push_back(obj);
+    aabbTree->InsertLeaf(obj);
 }

@@ -372,7 +372,7 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 					o = new Cylinder( scene, mat );
 				}
 
-				for (auto it = queue.begin(); it != queue.end(); it++)
+				for (auto it = --queue.end(); true; it--)
 				{
 					std::string s = (*it)->getString();
 					if (s == "translate") {
@@ -395,9 +395,13 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 																		tup[2]->getScalar()),
 																 tup[3]->getScalar()));
 					}
+
+					if (it == queue.begin())
+						break;
 				}
 				o->setTransform(trans);
 				o->setMaterial(m);
+				o->ComputeBoundingBox();
 				csg->addPrimitive(o);
 			}
 

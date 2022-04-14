@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../scene/scene.h"
+#include "../AABB.h"
 
 enum class OPT {
     NONE = -1,
@@ -40,10 +41,30 @@ public:
 
     void addPrimitive(MaterialSceneObject* obj);
     void addCSGTree(CSGTree* tree) { m_Tree = tree; }
+
+	// virtual bool intersectLocal( const ray& r, isect& i ) const;
+	virtual bool hasBoundingBoxCapability() const { return true; }
+    virtual BoundingBox ComputeLocalBoundingBox()
+    {
+        auto it = m_Objs.begin();
+        BoundingBox box = (*it)->getBoundingBox();
+        it++;
+
+        for (it; it != m_Objs.end(); it++)
+        {
+            box = Union(box, (*it)->getBoundingBox());
+        }
+
+        return box;
+    };
+
 private:
     vector<MaterialSceneObject*> m_Objs;
+
     Material* m_Mat;
     CSGTree* m_Tree;
+
+    Tree* aabbTree;
 };
 
 #endif
