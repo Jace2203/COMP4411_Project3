@@ -1,0 +1,84 @@
+SBT-raytracer 1.0
+
+/*
+Pay some effort to understand the file format if you really want to modify this file :P
+
+Note that this only support box,sphere and cylinder as primitive
+*/
+
+camera {
+	position = (3,3,3);
+	viewdir = (-1,-1,-1);
+	aspectratio = 1;
+	updir = (0,1,0);
+}
+
+
+
+
+point_light
+{
+	position = (2, 2, 2);
+	colour = (1.0, 1.0, 1.0);
+
+}
+
+point_light
+{
+	position = (2, 2, 0);
+	colour = (1.0, 1.0, 1.0);
+
+}
+
+point_light
+{
+	position = (0, 2, 2);
+	colour = (1.0, 1.0, 1.0);
+
+}
+
+
+material{
+	
+	name = "#3";
+	diffuse=( 0.0,0.0,0.8);
+    ambient=( 0.2,0.2,0.2);
+    specular=( 0,0,0);
+    emissive=( 0,0,0);
+    shininess=0.2;
+    transmissive=( 0,0,0 );
+}
+
+material{
+	
+	name = "#5";
+	diffuse=( 0.8,0.8,0.8);
+    ambient=( 0.2,0.2,0.2);
+    specular=( 0,0,0);
+    emissive=( 0,0,0);
+    shininess=0.2;
+    transmissive=( 0,0,0 );
+}
+
+
+csg{
+	primitiveNumber = 2;
+	
+	
+
+	queue0 = ("scale","box");
+	scale0 = (1.5,1.5,1.5);
+	primitive0 = "box";
+	materialID0 = "#5";
+
+	
+
+	queue1 = ("translate","scale","cylinder");
+	translate1 = (0,0,-0.5);
+	scale1 = (0.5,0.5,3.0);
+	primitive1 = "cylinder";
+	materialID1 = "#3";
+
+	operator = (0,"minus",1);
+
+}

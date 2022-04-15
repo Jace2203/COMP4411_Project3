@@ -262,8 +262,6 @@ public:
 	{
 		obj->ComputeBoundingBox();
 		BoundingBox bb = obj->getBoundingBox();
-		std::cout << bb.min << std::endl;
-		std::cout << bb.max << std::endl;
 		objects.push_back( obj );
 		tree.InsertLeaf(obj);
 	}

@@ -6,6 +6,7 @@
 #include "Box.h"
 
 #include "../scene/scene.h"
+#include "../helper.h"
 
 bool Box::intersectLocal( const ray& r, isect& i ) const
 {
@@ -20,7 +21,10 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 	if (!bound.intersect(r, tMin, tMax))
 		return false;
 	
-	i.t = tMin;
+	if (tMin < 0.0)
+		i.t = tMax;
+	else
+		i.t = tMin;
 	i.obj = this;
 	
 	vec3f p = r.getPosition();
@@ -87,4 +91,9 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 		}
 		break;
 	}
+
+	if (RayIn(p, bound.min, bound.max))
+		i.N *= -1;
+		
+	return true;
 }

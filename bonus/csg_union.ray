@@ -40,17 +40,6 @@ point_light
 
 material{
 	
-	name = "#1";
-	diffuse=( 0.0,0.7,0.0);
-    ambient=( 0.2,0.2,0.2);
-    specular=( 0,0,0);
-    emissive=( 0,0,0);
-    shininess=0.2;
-    transmissive=( 0,0,0 );
-}
-
-material{
-	
 	name = "#2";
 	diffuse=( 0.8,0.0,0.0);
     ambient=( 0.2,0.2,0.2);
@@ -82,54 +71,29 @@ material{
     transmissive=( 0,0,0 );
 }
 
-material{
-	
-	name = "#5";
-	diffuse=( 0.8,0.8,0.8);
-    ambient=( 0.2,0.2,0.2);
-    specular=( 0,0,0);
-    emissive=( 0,0,0);
-    shininess=0.2;
-    transmissive=( 0,0,0 );
-}
-
-
 csg{
-	primitiveNumber = 5;
-	
-	
+	primitiveNumber = 3;
 
-	queue0 = ("scale","box");
-	scale0 = (1.5,1.5,1.5);
-	primitive0 = "box";
-	materialID0 = "#5";
+	queue0 = ("translate","scale","cylinder");
+	translate0 = (0,0,-0.5);
+	scale0 = (0.5,0.5,3.0);
+	primitive0 = "cylinder";
+	materialID0 = "#3";
 
-	queue1 = ("sphere");
-	primitive1 = "sphere";
-	materialID1 = "#1";
+	queue1 = ("translate","scale","rotate","cylinder");
+	translate1 = (0,0,-0.5);
+	scale1 = (0.5,0.5,3.0);
+	rotate1 = (0,1,0,1.57);
+	primitive1 = "cylinder";
+	materialID1 = "#4";
 
-	
-
-	queue2 = ("translate","scale","cylinder");
+	queue2 = ("translate","scale","rotate","cylinder");
 	translate2 = (0,0,-0.5);
 	scale2 = (0.5,0.5,3.0);
+	rotate2 = (1,0,0,1.57);
 	primitive2 = "cylinder";
-	materialID2 = "#3";
+	materialID2 = "#2";
 
-	queue3 = ("translate","scale","rotate","cylinder");
-	translate3 = (0,0,-0.5);
-	scale3 = (0.5,0.5,3.0);
-	rotate3 = (0,1,0,1.57);
-	primitive3 = "cylinder";
-	materialID3 = "#4";
-
-	queue4 = ("translate","scale","rotate","cylinder");
-	translate4 = (0,0,-0.5);
-	scale4 = (0.5,0.5,3.0);
-	rotate4 = (1,0,0,1.57);
-	primitive4 = "cylinder";
-	materialID4 = "#2";
-
-	operator = ((0,"intersect",1),"minus",((2,"union",3),"union",4));
+	operator = ((0,"union",1),"union",2);
 
 }

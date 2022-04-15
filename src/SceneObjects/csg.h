@@ -21,7 +21,11 @@ public:
     CSGTree(int index);
     CSGTree(OPT opt, CSGTree* left, CSGTree* right);
 
+    isect* GetIsect(const std::vector<isect*>& is, const std::vector<int> indices);
+
 private:
+    void TraverseTree(std::vector<double>& line, const std::vector<isect*>& is, const std::vector<int> indicies);
+
     CSGTree* m_Left;
     CSGTree* m_Right;
 
@@ -42,7 +46,7 @@ public:
     void addPrimitive(MaterialSceneObject* obj);
     void addCSGTree(CSGTree* tree) { m_Tree = tree; }
 
-	// virtual bool intersectLocal( const ray& r, isect& i ) const;
+	virtual bool intersectLocal( const ray& r, isect& i ) const;
 	virtual bool hasBoundingBoxCapability() const { return true; }
     virtual BoundingBox ComputeLocalBoundingBox()
     {
@@ -59,7 +63,9 @@ public:
     };
 
 private:
-    vector<MaterialSceneObject*> m_Objs;
+    isect* GetIsect(const std::vector<isect*>& is) const;
+
+    vector<SceneObject*> m_Objs;
 
     Material* m_Mat;
     CSGTree* m_Tree;

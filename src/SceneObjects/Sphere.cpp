@@ -40,6 +40,8 @@ bool Sphere::intersectLocal( const ray& r, isect& i ) const
 
 	i.u = alpha / (2 * M_PI);
 	i.v = beta / M_PI;
+	if (v.length_squared() < 3.0)
+		i.N *= -1;
 
 	return true;
 }

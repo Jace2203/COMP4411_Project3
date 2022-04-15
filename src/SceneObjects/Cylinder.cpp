@@ -32,6 +32,11 @@ bool Cylinder::intersectLocal( const ray& r, isect& i ) const
 			i.u = (-P[0] + 1) / 2;
 			i.v = (P[1] + 1) / 2;
 		}
+
+		vec3f p = r.getPosition();
+		if (p[2] < 1.0 && p[2] > 0.0 && p.length() < sqrt(2))
+			i.N *= -1;
+
 		return true;
 	} else {
 		if( intersectBody( r, i ))
@@ -40,6 +45,9 @@ bool Cylinder::intersectLocal( const ray& r, isect& i ) const
 			double theta = atan2(P[1], P[0]) + M_PI;
 			i.u = theta / (2 * M_PI);
 			i.v = P[2];
+			vec3f p = r.getPosition();
+			if (p[2] < 1.0 && p[2] > 0.0 && vec3f(p[0], p[1], 0.0).length_squared() < 2.0)
+				i.N *= -1;
 			return true;
 		}
 		else

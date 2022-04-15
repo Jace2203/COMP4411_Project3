@@ -160,6 +160,21 @@ bool Tree::Intersect(const ray& r, isect& i) const
     }
 }
 
+void Tree::IntersectAll(const ray& r, std::vector<isect*>& is, double t) const
+{
+    isect i;
+    if (Intersect(r, i))
+    {
+        i.t += t;
+        is.push_back(new isect(i));
+        vec3f p = r.getPosition();
+        vec3f d = r.getDirection();
+
+        ray rr = ray(r.at(i.t - t) + d * RAY_EPSILON, d);
+        IntersectAll(rr, is, i.t);
+    }
+}
+
 void Tree::Update()
 {
     if (!m_Node->IsLeaf())

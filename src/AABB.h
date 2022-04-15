@@ -1,6 +1,7 @@
 #ifndef AABB_H
 #define AABB_H
 
+#include <vector>
 #include "vecmath/vecmath.h"
 
 #include "scene/ray.h"
@@ -43,6 +44,7 @@ public:
     double GetSurfaceArea() const;
 
     bool Intersect(const ray& r, isect& i) const;
+    void IntersectAll(const ray& r, std::vector<isect*>& is, double t = 0.0) const;
 private:
     void Update();
 
