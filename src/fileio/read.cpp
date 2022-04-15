@@ -294,7 +294,53 @@ static void processGeometry( string name, Obj *child, Scene *scene,
                                                              l4[3]->getScalar() ) ) ) );
 	} else if( name == "trimesh" || name == "polymesh" ) { // 'polymesh' is for backwards compatibility
         processTrimesh( name, child, scene, materials, transform);
-    } else {
+    } else if( name == "1") {
+		
+		SceneObject *obj = NULL;
+       	Material *mat;
+
+		std::cout << '1' << endl;
+
+		mat = getMaterial(getField( child, "material" ), materials );
+
+		vec3f direction = tupleToVec( getField( child, "direction" ) );
+		vec3f startColorMin = tupleToVec( getField( child, "startColorMin" ) );
+		vec3f startColorMax = tupleToVec( getField( child, "startColorMax" ) );
+		vec3f endColorMin = tupleToVec( getField( child, "endColorMin" ) );
+		vec3f endColorMax = tupleToVec( getField( child, "endColorMax" ) );
+
+		std::cout << '1' << endl;
+
+		double force = getField( child, "force" )->getScalar();
+		int minLife = getField( child, "minLife" )->getScalar();
+		int maxLife = getField( child, "maxLife" )->getScalar();
+		int numEmit = getField( child, "numEmit" )->getScalar();
+		int maxNumParticles = getField( child, "maxNumParticles" )->getScalar();
+		double maxSpeed = getField( child, "maxSpeed" )->getScalar();
+		double minSpeed = getField( child, "minSpeed" )->getScalar();
+
+		std::cout << '1' << endl;
+
+		double t = tan(30 * 3.14159265 / 180);
+		double diff  = 1 - t;
+		double size = RAY_EPSILON;
+
+		Trimesh *tmesh = new Trimesh( scene, mat, transform);
+
+		for(int time = 0; time < minLife; ++time)
+			for(int num = 0; num < numEmit && (num + 1) * t < maxNumParticles; ++num)
+			{
+				vec3f dir = vec3f( rand() % 101 * diff + t, rand() % 101 * diff + t, 0).normalize();
+				double v = min(maxSpeed, minSpeed + force * t);
+				vec3f pos = ( v * v + minSpeed * minSpeed / 2 / force) * dir;
+				tmesh->addVertex( vec3f(pos[0], pos[1] + 2 * size / 3, 0) );
+				tmesh->addVertex( vec3f(pos[0] - size / sqrt(3), pos[1] - size / 3, 0) );
+				tmesh->addVertex( vec3f(pos[0] + size / sqrt(3), pos[1] - size / 3, 0) );
+				mat->ka = vec3f(1, 1, 1) * pos.length();
+				tmesh->addMaterial( mat );
+				tmesh->addFace( time * numEmit + num, time * numEmit + num + 1, time * numEmit + num + 2 );
+			}
+	} else {
 		SceneObject *obj = NULL;
        	Material *mat;
         
@@ -586,7 +632,8 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 				name == "scale" ||
 				name == "transform" ||
                 name == "trimesh" ||
-                name == "polymesh") { // polymesh is for backwards compatibility.
+                name == "polymesh" ||
+				name == "meteorite") { // polymesh is for backwards compatibility.
 		processGeometry( name, child, scene, materials, &scene->transformRoot);
 		//scene->add( geo );
 	} else if( name == "material" ) {
