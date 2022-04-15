@@ -116,8 +116,10 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		const Material& m = i.getMaterial();
 
+		vec3f shade = m.shade(scene, r, i);
+
 		if (!depth)
-			return m.shade(scene, r, i);
+			return shade;
 
 		vec3f refl(0, 0, 0);
 		vec3f refr(0, 0, 0);
@@ -125,9 +127,10 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
 			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
+			vec3f new_thresh = prod( thresh, vec3f(1 / m.kr[0], 1/m.kr[1], 1/m.kr[2]) );
 
 			if (!traceUI->getGlossy())
-				refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1).clamp();
+				refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), new_thresh, depth - 1).clamp();
 			else
 			{
 				vec3f u(reflect.cross(vec3f(1, 0, 0)).normalize());
@@ -140,7 +143,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 						srand(time(NULL) + x + y);
 						vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
 						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.05;
-						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), thresh, depth - 1).clamp();
+						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), new_thresh, depth - 1).clamp();
 					}
 
 				refl /= 16;
@@ -149,11 +152,12 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		if (m.index != 1 && m.kt.length() >= thresh.length())
 		{
+			vec3f new_thresh = prod( thresh, vec3f(1 / m.kt[0], 1/m.kt[1], 1/m.kt[2]) );
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
-			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), thresh, depth - 1);
+			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), new_thresh, depth - 1);
 		}
 		
-		return m.shade(scene, r, i) + prod(m.kr, refl) + prod(m.kt, refr);
+		return shade + prod(m.kr, refl) + prod(m.kt, refr);
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
