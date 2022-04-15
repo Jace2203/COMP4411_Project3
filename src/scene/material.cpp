@@ -42,13 +42,16 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 	{
 		vec3f L((*it)->getDirection(P));
 
-		// if (L.dot(i.N) < 0)
-		// 	continue;
+		if (L.dot(i.N) < 0)
+			continue;
 
 		vec3f I((*it)->getColor(P));
 		vec3f R(ray::reflect(L, i.N).normalize());
 
 		vec3f atten((*it)->shadowAttenuation(P) * (*it)->distanceAttenuation(P));
+
+		if (atten.iszero())
+			continue;
 
 		// diffuse
 		vec3f d = diffuse * max(i.N.normalize() * L.normalize(), 0.0);

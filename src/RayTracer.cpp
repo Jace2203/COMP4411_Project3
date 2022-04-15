@@ -28,7 +28,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 
 	vec3f res(0, 0, 0);
 
-	vec3f dir(r.getDirection());
+	vec3f dir(r.getDirection().normalize());
 	vec3f u = dir.cross(vec3f(1, 0, 0));
 	if (u.iszero()) u = dir.cross(vec3f(0, 1, 0));
 	vec3f v = dir.cross(u);
@@ -42,8 +42,6 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 		for(int i = 0; i < a; ++i)
 		{
 			srand(time(NULL) + i);
-			// double offx = rand() % 11;
-			// double offy = rand() % 11;
 			double offx = 0.5;
 			double offy = 0.5;		
 
@@ -53,7 +51,6 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 					for(int x = 0; x < 4; ++x)
 					{
 						vec3f offset(vec3f(vec3f(offx * 0.1 + x, offy * 0.1 + y, 0) / 2 - vec3f(1, 1, 0)));
-						//vec3f new_eye = eye + prod(offset, (u + v).normalize()) + i * u * 1 / a;
 						vec3f new_eye = eye + prod(offset, (u + v).normalize()) * 0.07 + (-u - v) * i * 0.7 / a;
 						r = ray( new_eye, dir );
 						res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
@@ -72,7 +69,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 
 	if (traceUI->getDOF())
 	{
-		int a = 5;
+		int a = 10;
 
 		vec3f focus_pt = eye + dir * traceUI->getFocalLength();
 
@@ -84,7 +81,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 				for(int x = 0; x < 4; ++x)
 				{
 					vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
-					vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.1;
+					vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.125;
 					r = ray( new_eye, (focus_pt - new_eye).normalize() );
 					res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 				}
@@ -143,7 +140,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 					{
 						srand(time(NULL) + x + y);
 						vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
-						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.05;
+						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.06;
 						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), new_thresh, depth - 1).clamp();
 					}
 
@@ -151,14 +148,14 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			}
 		}
 
-		if (m.index != 1 && m.kt.length() >= thresh.length())
+		if (!m.kt.iszero() && m.kt.length() >= thresh.length())
 		{
 			vec3f new_thresh = prod( thresh, vec3f(1 / m.kt[0], 1/m.kt[1], 1/m.kt[2]) );
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
 			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), new_thresh, depth - 1);
 		}
 		
-		return shade + prod(m.kr, refl) + prod(m.kt, refr);
+		return prod( (vec3f(1, 1, 1) - m.kr), shade ) + prod(m.kr, refl) + prod(m.kt, refr);
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
@@ -234,68 +231,14 @@ bool RayTracer::loadScene( char* fn )
 
 void RayTracer::loadHField(unsigned char *data, unsigned char *grey, int width, int height)
 {
-	// std::cout << sceneLoaded() << endl;
-
-	// std::cout << '1' << endl;
-
-	// std::cout << width << endl;
-	// std::cout << height << endl;
-
 	Material *mat = new Material();
 	mat->kd = vec3f(1, 0, 0);
 
  	Trimesh *tmesh = new Trimesh( scene, mat, &scene->transformRoot);
-
-    // tmesh->addVertex( vec3f(0,0,0)); 
-    // tmesh->addVertex( vec3f(0,1,0)); 
-    // tmesh->addVertex( vec3f(0,1,1)); 
-    // tmesh->addVertex( vec3f(0,0,1));
-    // tmesh->addVertex( vec3f(1,0,0)); 
-    // tmesh->addVertex( vec3f(1,1,0)); 
-    // tmesh->addVertex( vec3f(1,1,1)); 
-    // tmesh->addVertex( vec3f(1,0,1));
-	
-    // tmesh->addFace(2,3,7); 
-    // tmesh->addFace(1,5,4); 
-    // tmesh->addFace(2,1,0);
-    // tmesh->addFace(6,7,4); 
-    // tmesh->addFace(2,6,5); 
-    // tmesh->addFace(3,0,4);
-
-	// Material *mt = new Material();
-    // mt->kd = vec3f(1,0,0);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(0,1,0);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(0.3,0.2,0); 
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(0,1,0);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(1,0,0);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(1,1,0);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(0.4,0.3,0.3);
-	// tmesh->addMaterial( mt );
-	// mt = new Material();
-    // mt->kd = vec3f(1,0,1);
-	// tmesh->addMaterial( mt );
 	
 	for(int j = 0; j < height; ++j)
 		for(int i = 0; i < width; ++i)
-		{
-			// std::cout << (vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255) << endl;
-			tmesh->addVertex( vec3f( j, -(vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255).length() * 2, i) / 4);
-		}
-			// tmesh->addVertex( vec3f( j, 0, i) / 4);
-
-	std::cout << '2' << endl;
+			tmesh->addVertex( vec3f( j, -(vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255).length() * width / 8, i) / width * 4);
 
 	for(int j = 0; j < height - 1; ++j)
 	{
@@ -304,10 +247,7 @@ void RayTracer::loadHField(unsigned char *data, unsigned char *grey, int width, 
 			tmesh->addFace(i + 1 + (j + 1) * width, i + (j + 1) * width, i + j * width);
 			tmesh->addFace(i + 1 + (j + 1) * width, i + j * width, i + 1 + j * width);
 		}
-		std::cout << j << endl;
 	}
-
-	std::cout << '3' << endl;
 
 	for(int j = 0; j < height; ++j)
 		for(int i = 0; i < width; ++i)
@@ -317,9 +257,6 @@ void RayTracer::loadHField(unsigned char *data, unsigned char *grey, int width, 
 			tmesh->addMaterial( mt );
 		}
 
-	std::cout << '4' << endl;
-
-	// scene->add(tmesh);
 	scene->initScene();
 }
 

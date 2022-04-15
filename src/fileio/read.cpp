@@ -568,13 +568,24 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			throw ParseError( "No info for directional_light" );
 		}
 
-		scene->add( new WarnLight( scene, 
+		WarnLight *light = new WarnLight( scene, 
 			tupleToVec( getField( child, "position" ) ),
 			tupleToVec( getField( child, "colour" ) ),
 			tupleToVec( getField( child, "direction" ) ),
 			tupleToVec( getField( child, "edgeplace" ) ),
-			tupleToVec( getField( child, "min_flap" ) ),
-			tupleToVec( getField( child, "max_flap" ) ) ) );
+			tupleToVec( getField( child, "flap_0" ) ),
+			tupleToVec( getField( child, "flap_1" ) ) );
+
+		if (!getField( child, "shape" )->getString().compare("rectangle"))
+			light->shape = 0;
+		else if (!getField( child, "shape" )->getString().compare("triangle"))
+			light->shape = 1;
+		else if (!getField( child, "shape" )->getString().compare("circle"))
+			light->shape = 2;
+
+		std::cout << light->shape << endl;
+
+		scene->add( light );
 	} else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
