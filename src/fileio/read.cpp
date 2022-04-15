@@ -376,10 +376,10 @@ static void processTrimesh( string name, Obj *child, Scene *scene,
         }
     }
 
-    bool generateNormals = false;
-    maybeExtractField( child, "gennormals", generateNormals );
-    if( generateNormals )
-        tmesh->generateNormals();
+    // bool generateNormals = false;
+    // maybeExtractField( child, "gennormals", generateNormals );
+    // if( generateNormals )
+    //     tmesh->generateNormals();
             
     if( hasField( child, "materials" ) )
     {
@@ -387,16 +387,16 @@ static void processTrimesh( string name, Obj *child, Scene *scene,
         for( mytuple::const_iterator mi = mats.begin(); mi != mats.end(); ++mi )
             tmesh->addMaterial( getMaterial( *mi, materials ) );
     }
-    if( hasField( child, "normals" ) )
-    {
-        const mytuple &norms = getField( child, "normals" )->getTuple();
-        for( mytuple::const_iterator ni = norms.begin(); ni != norms.end(); ++ni )
-            tmesh->addNormal( tupleToVec( *ni ) );
-    }
+    // if( hasField( child, "normals" ) )
+    // {
+    //     const mytuple &norms = getField( child, "normals" )->getTuple();
+    //     for( mytuple::const_iterator ni = norms.begin(); ni != norms.end(); ++ni )
+    //         tmesh->addNormal( tupleToVec( *ni ) );
+    // }
 
-    char *error;
-    if( error = tmesh->doubleCheck() )
-        throw ParseError( error );
+    // char *error;
+    // if( error = tmesh->doubleCheck() )
+    //     throw ParseError( error );
 
     scene->add(tmesh);
 }

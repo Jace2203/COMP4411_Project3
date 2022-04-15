@@ -25,6 +25,8 @@ public:
 
 	bool sceneLoaded();
 
+	void loadHField(unsigned char *data, unsigned char *grey, int width, int height);
+
 private:
 	unsigned char *buffer;
 	int buffer_width, buffer_height;
