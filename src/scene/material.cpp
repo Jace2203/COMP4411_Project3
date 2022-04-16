@@ -60,8 +60,8 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 			diffuse = vec3f(d, d, d);
 			
 			int uu = min(u + 1, size - 1), vv = min(v + 1, size - 1);
-			dr = d - (noise[int(v) * width + uu] / 255.0);
-			dg = d - (noise[vv * width + int(u)] / 255.0);
+			dr = d - (noise[int(v) * size + uu] / 255.0);
+			dg = d - (noise[vv * size + int(u)] / 255.0);
 		}
 		else
 		{

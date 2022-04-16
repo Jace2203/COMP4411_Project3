@@ -268,6 +268,7 @@ vec3f RayTracer::AdaptSampling(double x, double y, int depth)
 		}
 		delete[] cache[i];
 	}
+	delete[] cache;
 
 	return result;
 }
