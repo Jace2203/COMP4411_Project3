@@ -102,7 +102,7 @@ double SpotLight::distanceAttenuation( const vec3f& P ) const
 	if (direction.dot(-getDirection(P)) < cutoff)
 		return 0.0;
 
-	return pow( direction.dot(-getDirection(P)), 2);
+	return pow( direction.dot(-getDirection(P)), 20);
 }
 
 vec3f SpotLight::getColor( const vec3f& P ) const
@@ -121,7 +121,7 @@ vec3f SpotLight::shadowAttenuation(const vec3f& P) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return i.getMaterial().kt;;
+		return i.getMaterial().kt;
 
     return vec3f(1, 1, 1);
 }
@@ -134,7 +134,7 @@ double WarnLight::distanceAttenuation( const vec3f& P ) const
 			if (flap_0[1] <= P[1] && P[1] <= flap_1[1])
 				if (flap_0[2] <= P[2] && P[2] <= flap_1[2])
 					if (direction.dot(-getDirection(P)) >= cutoff)
-						return pow( direction.dot(-getDirection(P)), 8);
+						return pow( direction.dot(-getDirection(P)), 2);
 	}
 	else if (shape == 1)
 	{
@@ -150,7 +150,7 @@ double WarnLight::distanceAttenuation( const vec3f& P ) const
 				if (flap_0[2] <= P[2] && P[2] <= flap_1[2])
 					if (direction.dot(-getDirection(P)) >= cutoff)
 						if (P[0] - p[0] <= m * (P[2] - p[2]))
-							return pow( direction.dot(-getDirection(P)), 8);
+							return pow( direction.dot(-getDirection(P)), 2);
 	}
 	else if (shape == 2)
 	{
@@ -159,7 +159,7 @@ double WarnLight::distanceAttenuation( const vec3f& P ) const
 		if (flap_0[1] <= P[1] && P[1] <= flap_1[1]) // trim made by this boundury
 			if (direction.dot(-getDirection(P)) >= cutoff)
 				if ( prod(c - flap_0, vec3f(1, 0, 1)).length() >= prod(c - P, vec3f(1, 0, 1)).length() )
-					return pow( direction.dot(-getDirection(P)), 8);
+					return pow( direction.dot(-getDirection(P)), 2);
 	}
 
 	return 0.0;

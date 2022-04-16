@@ -43,6 +43,27 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 	}
 }
 
+void TraceUI::cb_load_background(Fl_Menu_* o, void* v) 
+{
+	TraceUI* pUI=whoami(o);
+	
+	char* newfile = fl_file_chooser("Open Scene?", "*.bmp", NULL );
+
+	if (newfile != NULL) {
+		int				width,
+						height;
+
+		if ( (pUI->raytracer->background=readBMP(newfile, width, height))==NULL )
+		{
+			fl_alert("Can't load bitmap file");
+		}
+
+		pUI->raytracer->bgwidth = width;
+		pUI->raytracer->bgheight = height;
+		pUI->raytracer->bgloaded = true;;
+	}
+}
+
 void TraceUI::cb_load_hfield(Fl_Menu_* o, void* v) 
 {
 	TraceUI* pUI=whoami(o);
@@ -382,6 +403,7 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
+		{ "&Load Background Image",	FL_ALT + 'b', (Fl_Callback *)TraceUI::cb_load_background },
 		{ "&Load HField Map",	FL_ALT + 'h', (Fl_Callback *)TraceUI::cb_load_hfield },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },

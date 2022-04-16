@@ -22,6 +22,8 @@ extern TraceUI* traceUI;
 // in an initial ray weight of (0.0,0.0,0.0) and an initial recursion depth of 0.
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
+	this->x = x;
+	this->y = y;
 	ray r( vec3f(0,0,0), vec3f(0,0,0) );
 	scene->getCamera()->rayThrough( x,y,r );
 
@@ -171,6 +173,19 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// it according to the background color, which in this (simple) case
 		// is just black.
 
+		if (bgloaded)
+		{
+
+			int i = x / buffer_width * bgwidth;
+			int j = y / buffer_height * bgheight;
+
+			// std::cout << x << ' ' << y << endl;
+			// std::cout << buffer_width << ' ' << buffer_height << endl;
+			// std::cout << bgwidth << ' ' << bgwidth << endl;
+			std::cout << i << ' ' << j << endl;
+
+			return vec3f( background[(i + j * bgwidth) * 3] / 255, background[(i + j * bgwidth) * 3 + 1] / 255, background[(i + j * bgwidth) * 3 + 2] / 255 );
+		}
 		return vec3f( 0.0, 0.0, 0.0 );
 	}
 }

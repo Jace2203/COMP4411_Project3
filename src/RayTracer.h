@@ -30,11 +30,17 @@ public:
 	int getNoiseSize();
 	void loadHField(unsigned char *data, unsigned char *grey, int width, int height);
 
+	unsigned char *background;
+	int bgwidth, bgheight;
+	bool bgloaded = false;
+
 private:
 	unsigned char *buffer;
 	int buffer_width, buffer_height;
 	int bufferSize;
 	Scene *scene;
+
+	double x, y;
 
 	bool m_bSceneLoaded;
 
