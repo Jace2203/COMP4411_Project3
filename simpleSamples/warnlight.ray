@@ -1,0 +1,60 @@
+SBT-raytracer 1.0
+
+camera
+{
+	position = (0, 7, 7);
+	viewdir = (0, -7, -7);
+	updir = (0, 1, 0);
+}
+
+point_light
+{
+	position = (0, 2, 0);
+	color = (0.3, 0.7, 0.3);
+}
+
+warn_light {
+	shape = 0;
+	position = (0, 2, 0);
+	direction = (0, -2, 0);
+	edgeplace = (90, 0, 0);
+	colour = (1, 0, 0);
+	flap_0 = (-1, -1, -1);
+	flap_1 = (2, 1, 2);
+}
+
+warn_light {
+	shape = 1;
+	position = (0, 2, 0);
+	direction = (0, -2, 0);
+	edgeplace = (90, 0, 0);
+	colour = (0, 1, 0);
+	flap_0 = (-2, -1, -2);
+	flap_1 = (1, 1, 1);
+}
+
+warn_light {
+	shape = 2;
+	position = (0, 2, 0);
+	direction = (0, -2, 0);
+	edgeplace = (90, 0, 0);
+	colour = (0, 0, 1);
+	flap_0 = (-2, -1, -2);
+	flap_1 = (1, 1, 1);
+}
+
+scale(0.7, 
+translate(-1, 0.5, -1,
+box {
+	material = { 
+		diffuse = (1, 1, 1); 
+	}}
+))
+
+translate( 0, 0, 0,
+	scale( 15, 1, 15, 
+		box {
+			material = { 
+				diffuse = (1, 1, 1); 
+			}
+		} ) )

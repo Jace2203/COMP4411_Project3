@@ -176,15 +176,15 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		if (bgloaded)
 		{
 
-			int i = x / buffer_width * bgwidth;
-			int j = y / buffer_height * bgheight;
+			int i = x  * bgwidth;
+			int j = y  * bgheight;
 
-			// std::cout << x << ' ' << y << endl;
+			// std::cout << i << ' ' << j << endl;
 			// std::cout << buffer_width << ' ' << buffer_height << endl;
 			// std::cout << bgwidth << ' ' << bgwidth << endl;
-			std::cout << i << ' ' << j << endl;
+			//std::cout << i << ' ' << j << endl;
 
-			return vec3f( background[(i + j * bgwidth) * 3] / 255, background[(i + j * bgwidth) * 3 + 1] / 255, background[(i + j * bgwidth) * 3 + 2] / 255 );
+			return vec3f( background[(i + j * bgwidth) * 3] / 255.0, background[(i + j * bgwidth) * 3 + 1] / 255.0, background[(i + j * bgwidth) * 3 + 2] / 255.0 );
 		}
 		return vec3f( 0.0, 0.0, 0.0 );
 	}
@@ -204,9 +204,12 @@ RayTracer::RayTracer()
 
 RayTracer::~RayTracer()
 {
+	bgloaded = 0;
 	delete [] buffer;
 	delete scene;
 	delete [] m_dNoiseTexture;
+	delete []background;
+	background = nullptr;
 }
 
 void RayTracer::getBuffer( unsigned char *&buf, int &w, int &h )

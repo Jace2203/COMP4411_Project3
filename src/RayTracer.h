@@ -30,7 +30,7 @@ public:
 	int getNoiseSize();
 	void loadHField(unsigned char *data, unsigned char *grey, int width, int height);
 
-	unsigned char *background;
+	unsigned char *background = nullptr;
 	int bgwidth, bgheight;
 	bool bgloaded = false;
 

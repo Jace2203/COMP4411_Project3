@@ -53,6 +53,9 @@ void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 		int				width,
 						height;
 
+		if (pUI->raytracer->background)
+			delete []pUI->raytracer->background;
+
 		if ( (pUI->raytracer->background=readBMP(newfile, width, height))==NULL )
 		{
 			fl_alert("Can't load bitmap file");
@@ -60,7 +63,7 @@ void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 
 		pUI->raytracer->bgwidth = width;
 		pUI->raytracer->bgheight = height;
-		pUI->raytracer->bgloaded = true;;
+		pUI->raytracer->bgloaded = true;
 	}
 }
 

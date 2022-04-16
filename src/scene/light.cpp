@@ -91,7 +91,7 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 		ray shadow(P + RAY_EPSILON * this->getDirection(P), this->getDirection(P));
 
 		if (scene->intersect(shadow, i))
-			return i.getMaterial().kt;;
+			return i.getMaterial().kt;
 
 		return vec3f(1, 1, 1);
 	}
@@ -102,7 +102,7 @@ double SpotLight::distanceAttenuation( const vec3f& P ) const
 	if (direction.dot(-getDirection(P)) < cutoff)
 		return 0.0;
 
-	return pow( direction.dot(-getDirection(P)), 20);
+	return pow( direction.dot(-getDirection(P)), 5);
 }
 
 vec3f SpotLight::getColor( const vec3f& P ) const
@@ -128,29 +128,31 @@ vec3f SpotLight::shadowAttenuation(const vec3f& P) const
 
 double WarnLight::distanceAttenuation( const vec3f& P ) const
 {
+	double coe = 1;
+
 	if (shape == 0)
 	{
 		if (flap_0[0] <= P[0] && P[0] <= flap_1[0])
 			if (flap_0[1] <= P[1] && P[1] <= flap_1[1])
 				if (flap_0[2] <= P[2] && P[2] <= flap_1[2])
 					if (direction.dot(-getDirection(P)) >= cutoff)
-						return pow( direction.dot(-getDirection(P)), 2);
+						return pow( direction.dot(-getDirection(P)), coe);
 	}
 	else if (shape == 1)
 	{
 		double delta_x = flap_1[0] - flap_0[0];
 		double delta_z = flap_0[2] - flap_1[2];
 		double m = delta_x / delta_z;
-		vec3f p( flap_1[2], flap_0[0], 0);
-		vec3f q( flap_0[2], flap_1[0], 0);
-		double intercept = p[1] / m + p[0];
+		vec3f p( flap_0[0], 0, flap_1[2]);
+		vec3f q( flap_1[0], 0, flap_0[2]);
+		double intercept = -p[0] / m + p[2];
 
 		if (flap_0[0] <= P[0] && P[0] <= flap_1[0])
 			if (flap_0[1] <= P[1] && P[1] <= flap_1[1])
 				if (flap_0[2] <= P[2] && P[2] <= flap_1[2])
 					if (direction.dot(-getDirection(P)) >= cutoff)
-						if (P[0] - p[0] <= m * (P[2] - p[2]))
-							return pow( direction.dot(-getDirection(P)), 2);
+						if (P[0] - p[0] - m * (P[2] - p[2]) > 0)
+							return pow( direction.dot(-getDirection(P)), coe);
 	}
 	else if (shape == 2)
 	{
@@ -159,7 +161,7 @@ double WarnLight::distanceAttenuation( const vec3f& P ) const
 		if (flap_0[1] <= P[1] && P[1] <= flap_1[1]) // trim made by this boundury
 			if (direction.dot(-getDirection(P)) >= cutoff)
 				if ( prod(c - flap_0, vec3f(1, 0, 1)).length() >= prod(c - P, vec3f(1, 0, 1)).length() )
-					return pow( direction.dot(-getDirection(P)), 2);
+					return pow( direction.dot(-getDirection(P)), coe);
 	}
 
 	return 0.0;
@@ -181,7 +183,7 @@ vec3f WarnLight::shadowAttenuation(const vec3f& P) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return i.getMaterial().kt;;
+		return i.getMaterial().kt;
 
     return vec3f(1, 1, 1);
 }
