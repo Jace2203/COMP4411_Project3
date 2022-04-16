@@ -85,7 +85,7 @@ public:
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
 
-	int shape;
+	int shape; // 0 = rectangle, 1 = triangle, 2 = circle
 
 protected:
 	vec3f position;

@@ -19,7 +19,7 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 	isect i;
 
 	if (scene->intersect(shadow, i))
-		return i.getMaterial().kt;;
+		return i.getMaterial().kt;
 
     return vec3f(1, 1, 1);
 }
@@ -49,7 +49,7 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 	double b_factor = traceUI->getLinear();
 	double c_factor = traceUI->getQuadric();
 
-	return min(1.0, 1.0 / (a * a_factor + b * b_factor * d + c * c_factor * d * d));
+	return min(1.0, 1.0 / (a * a_factor + b * b_factor * d + c * 1000 * c_factor * d * d));
 }
 
 vec3f PointLight::getColor( const vec3f& P ) const
@@ -102,7 +102,7 @@ double SpotLight::distanceAttenuation( const vec3f& P ) const
 	if (direction.dot(-getDirection(P)) < cutoff)
 		return 0.0;
 
-	return pow( cos(direction.dot(-getDirection(P))), 2);
+	return pow( direction.dot(-getDirection(P)), 2);
 }
 
 vec3f SpotLight::getColor( const vec3f& P ) const
@@ -134,7 +134,10 @@ double WarnLight::distanceAttenuation( const vec3f& P ) const
 			if (flap_0[1] <= P[1] && P[1] <= flap_1[1])
 				if (flap_0[2] <= P[2] && P[2] <= flap_1[2])
 					if (direction.dot(-getDirection(P)) >= cutoff)
+					{
+						std::cout << '1' << endl;
 						return pow( direction.dot(-getDirection(P)), 8);
+					}
 	}
 	else if (shape == 1)
 	{

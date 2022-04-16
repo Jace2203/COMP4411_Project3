@@ -576,14 +576,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec( getField( child, "flap_0" ) ),
 			tupleToVec( getField( child, "flap_1" ) ) );
 
-		if (!getField( child, "shape" )->getString().compare("rectangle"))
-			light->shape = 0;
-		else if (!getField( child, "shape" )->getString().compare("triangle"))
-			light->shape = 1;
-		else if (!getField( child, "shape" )->getString().compare("circle"))
-			light->shape = 2;
-
-		std::cout << light->shape << endl;
+		light->shape = getField( child, "shape" )->getScalar();
 
 		scene->add( light );
 	} else if( 	name == "sphere" ||

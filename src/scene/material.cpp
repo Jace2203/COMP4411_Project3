@@ -37,7 +37,6 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 		diffuse = vec3f(d[0]/255.0, d[1]/255.0, d[2]/255.0);
 	}
 
-	// ambient
 	for (auto& it = scene->beginLights(); it != scene->endLights(); it++)
 	{
 		vec3f L((*it)->getDirection(P));

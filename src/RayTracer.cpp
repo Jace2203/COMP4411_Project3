@@ -110,11 +110,10 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
 
-		//std::cout << thresh << endl;
-
 		const Material& m = i.getMaterial();
 
-		vec3f shade = m.shade(scene, r, i);
+		// vec3f shade = m.shade(scene, r, i);
+		vec3f shade = prod( (vec3f(1, 1, 1) - m.kt), m.shade(scene, r, i) ).clamp();
 
 		if (!depth)
 			return shade;
@@ -125,7 +124,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
 			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
-			vec3f new_thresh = prod( thresh, vec3f(1 / m.kr[0], 1/m.kr[1], 1/m.kr[2]) );
+
+			vec3f new_thresh = thresh;
+			if (!thresh.iszero())
+			{
+				vec3f kr( (!m.kr[0]) ? m.kr[0] : 1, (!m.kr[1]) ? m.kr[1] : 1, (!m.kr[2]) ? m.kr[2] : 1 );
+				new_thresh = prod( thresh, vec3f(1 / kr[0], 1/kr[1], 1/kr[2]) );
+			}
 
 			if (!traceUI->getGlossy())
 				refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), new_thresh, depth - 1).clamp();
@@ -143,20 +148,23 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.06;
 						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), new_thresh, depth - 1).clamp();
 					}
-
 				refl /= 16;
 			}
 		}
 
 		if (!m.kt.iszero() && m.kt.length() >= thresh.length())
 		{
-			vec3f new_thresh = prod( thresh, vec3f(1 / m.kt[0], 1/m.kt[1], 1/m.kt[2]) );
+			vec3f new_thresh = thresh;
+			if (!thresh.iszero())
+			{
+				vec3f kt( (!m.kt[0]) ? m.kt[0] : 1, (!m.kt[1]) ? m.kt[1] : 1, (!m.kt[2]) ? m.kt[2] : 1 );
+				new_thresh = prod( thresh, vec3f(1 / kt[0], 1/kt[1], 1/kt[2]) );
+			}
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
-			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), new_thresh, depth - 1);
-		}
+			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), new_thresh, depth - 1).clamp();
+		}	
 		
-		return prod( (vec3f(1, 1, 1) - m.kr), shade ) + prod(m.kr, refl) + prod(m.kt, refr);
-	
+		return shade + prod(m.kr, refl) + prod(m.kt, refr);	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
