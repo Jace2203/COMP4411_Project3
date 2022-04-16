@@ -447,7 +447,7 @@ TraceUI::TraceUI() {
 	m_bAABB = false;
 
 	m_nNoiseInput = 3;
-	m_nNoiseScale = 1;
+	m_nNoiseScale = 2;
 	m_bNoiseTexture = false;
 
 	m_mainWindow = new Fl_Window(100, 40, 350, 480, "Ray <Not Loaded>");
@@ -640,7 +640,7 @@ TraceUI::TraceUI() {
 		m_apertureSizeSlider->callback(cb_apertureSizeSlider);
 
 		// install button AABB
-		m_motionButton = new Fl_Light_Button(10, 375, 70, 25,"AABB");
+		m_motionButton = new Fl_Light_Button(10, 375, 70, 25,"BVH");
 		m_motionButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_motionButton->callback(cb_aabbButton);
 
@@ -649,7 +649,7 @@ TraceUI::TraceUI() {
 		m_noiseInputSlider->type(FL_HOR_NICE_SLIDER);
         m_noiseInputSlider->labelfont(FL_COURIER);
         m_noiseInputSlider->labelsize(12);
-		m_noiseInputSlider->minimum(3);
+		m_noiseInputSlider->minimum(1);
 		m_noiseInputSlider->maximum(10);
 		m_noiseInputSlider->step(1);
 		m_noiseInputSlider->value(m_nNoiseInput);
@@ -661,7 +661,7 @@ TraceUI::TraceUI() {
 		m_noiseScaleSlider->type(FL_HOR_NICE_SLIDER);
         m_noiseScaleSlider->labelfont(FL_COURIER);
         m_noiseScaleSlider->labelsize(12);
-		m_noiseScaleSlider->minimum(1);
+		m_noiseScaleSlider->minimum(2);
 		m_noiseScaleSlider->maximum(5);
 		m_noiseScaleSlider->step(1);
 		m_noiseScaleSlider->value(m_nNoiseScale);
