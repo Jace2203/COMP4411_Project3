@@ -43,14 +43,6 @@ warn_light {
 	flap_1 = (1, 1, 1);
 }
 
-scale(0.7, 
-translate(-1, 0.5, -1,
-box {
-	material = { 
-		diffuse = (1, 1, 1); 
-	}}
-))
-
 translate( 0, 0, 0,
 	scale( 15, 1, 15, 
 		box {
