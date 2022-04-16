@@ -49,7 +49,7 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 	double b_factor = traceUI->getLinear();
 	double c_factor = traceUI->getQuadric();
 
-	return min(1.0, 1.0 / (a * a_factor + b * b_factor * d + c * 1000 * c_factor * d * d));
+	return min(1.0, 1.0 / (a * a_factor + b * b_factor * d + c * 1500 * c_factor * d * d));
 }
 
 vec3f PointLight::getColor( const vec3f& P ) const
