@@ -173,16 +173,11 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// it according to the background color, which in this (simple) case
 		// is just black.
 
-		if (bgloaded)
+		if (bgloaded && traceUI->getBackground())
 		{
 
 			int i = x  * bgwidth;
 			int j = y  * bgheight;
-
-			// std::cout << i << ' ' << j << endl;
-			// std::cout << buffer_width << ' ' << buffer_height << endl;
-			// std::cout << bgwidth << ' ' << bgwidth << endl;
-			//std::cout << i << ' ' << j << endl;
 
 			return vec3f( background[(i + j * bgwidth) * 3] / 255.0, background[(i + j * bgwidth) * 3 + 1] / 255.0, background[(i + j * bgwidth) * 3 + 2] / 255.0 );
 		}

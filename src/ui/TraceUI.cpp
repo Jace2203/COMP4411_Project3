@@ -582,13 +582,6 @@ TraceUI::TraceUI() {
 		m_backgroundButton = new Fl_Light_Button(10, 260, 110, 25,"&Background");
 		m_backgroundButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_backgroundButton->callback(cb_backgroundButton);
-		m_backgroundButton->deactivate();
-
-		// install lightbutton Texture
-		m_textureButton = new Fl_Light_Button(135, 260, 85, 25,"&Texture");
-		m_textureButton->user_data((void*)(this));   // record self to be used by static callback functions
-		m_textureButton->callback(cb_textureButton);
-		m_textureButton->deactivate();
 
 		// install lightbutton Bump mapping
 		m_bumpMappingButton = new Fl_Light_Button(220, 260, 120, 25,"&Bump mapping");
