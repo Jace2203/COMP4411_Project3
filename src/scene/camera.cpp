@@ -1,5 +1,9 @@
 #include "camera.h"
 
+#include "../ui/TraceUI.h"
+
+extern TraceUI *traceUI;
+
 #define PI 3.14159265359
 #define SHOW(x) (cerr << #x << " = " << (x) << "\n")
 
@@ -21,8 +25,8 @@ Camera::rayThrough( double x, double y, ray &r )
 {
     x -= 0.5;
     y -= 0.5;
-    vec3f dir = look + x * u + y * v;
-    r = ray( eye, dir.normalize() );
+    vec3f dir = (look + x * u + y * v).normalize();
+    r = ray( eye, dir.normalize());
 }
 
 void

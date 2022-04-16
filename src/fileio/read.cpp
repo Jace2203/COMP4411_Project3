@@ -454,10 +454,10 @@ static void processTrimesh( string name, Obj *child, Scene *scene,
         }
     }
 
-    bool generateNormals = false;
-    maybeExtractField( child, "gennormals", generateNormals );
-    if( generateNormals )
-        tmesh->generateNormals();
+    // bool generateNormals = false;
+    // maybeExtractField( child, "gennormals", generateNormals );
+    // if( generateNormals )
+    //     tmesh->generateNormals();
             
     if( hasField( child, "materials" ) )
     {
@@ -465,16 +465,16 @@ static void processTrimesh( string name, Obj *child, Scene *scene,
         for( mytuple::const_iterator mi = mats.begin(); mi != mats.end(); ++mi )
             tmesh->addMaterial( getMaterial( *mi, materials ) );
     }
-    if( hasField( child, "normals" ) )
-    {
-        const mytuple &norms = getField( child, "normals" )->getTuple();
-        for( mytuple::const_iterator ni = norms.begin(); ni != norms.end(); ++ni )
-            tmesh->addNormal( tupleToVec( *ni ) );
-    }
+    // if( hasField( child, "normals" ) )
+    // {
+    //     const mytuple &norms = getField( child, "normals" )->getTuple();
+    //     for( mytuple::const_iterator ni = norms.begin(); ni != norms.end(); ++ni )
+    //         tmesh->addNormal( tupleToVec( *ni ) );
+    // }
 
-    char *error;
-    if( error = tmesh->doubleCheck() )
-        throw ParseError( error );
+    // char *error;
+    // if( error = tmesh->doubleCheck() )
+    //     throw ParseError( error );
 
     scene->add(tmesh);
 }
@@ -630,7 +630,6 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec( getField( child, "position" ) ),
 			tupleToVec( getColorField( child ) ) );
 
-
 		if( hasField( child, "constant_attenuation_coeff" ) ) light->a = getField( child, "constant_attenuation_coeff" )->getScalar();
 		if( hasField( child, "linear_attenuation_coeff" ) ) light->b = getField( child, "linear_attenuation_coeff" )->getScalar();
 		if( hasField( child, "quadratic_attenuation_coeff" ) ) light->c = getField( child, "quadratic_attenuation_coeff" )->getScalar();
@@ -648,6 +647,22 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			tupleToVec( getField( child, "colour" ) ),
 			tupleToVec( getField( child, "direction" ) ),
 			tupleToVec( getField( child, "edgeplace" ) ) ) );
+	} else if( name == "warn_light" ) {
+		if( child == NULL ) {
+			throw ParseError( "No info for directional_light" );
+		}
+
+		WarnLight *light = new WarnLight( scene, 
+			tupleToVec( getField( child, "position" ) ),
+			tupleToVec( getField( child, "colour" ) ),
+			tupleToVec( getField( child, "direction" ) ),
+			tupleToVec( getField( child, "edgeplace" ) ),
+			tupleToVec( getField( child, "flap_0" ) ),
+			tupleToVec( getField( child, "flap_1" ) ) );
+
+		light->shape = getField( child, "shape" )->getScalar();
+
+		scene->add( light );
 	} else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||

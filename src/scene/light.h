@@ -49,9 +49,9 @@ public:
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
 
-	double a = traceUI->getConstant();
-	double b = traceUI->getLinear();
-	double c = traceUI->getQuadric();
+	double a = 0;
+	double b = 0;
+	double c = 0;
 
 protected:
 	vec3f position;
@@ -62,7 +62,7 @@ class SpotLight
 {
 public:
 	SpotLight( Scene *scene, const vec3f& pos, const vec3f& color, const vec3f& dir, const vec3f& edgeplace)
-		: Light( scene, color ), position( pos ), direction(dir), edgeplace(edgeplace), cutoff( dir.dot((dir + edgeplace)) / (dir.length() * (dir + edgeplace).length())) {}
+		: Light( scene, color ), position( pos ), direction(dir.normalize()), cutoff( cos(edgeplace[0] * 3.14159265 / 180) ) {}
 	virtual vec3f shadowAttenuation(const vec3f& P) const;
 	virtual double distanceAttenuation( const vec3f& P ) const;
 	virtual vec3f getColor( const vec3f& P ) const;
@@ -71,7 +71,27 @@ public:
 protected:
 	vec3f position;
 	vec3f direction;
-	vec3f edgeplace;
+	double cutoff;
+};
+
+class WarnLight
+	: public Light
+{
+public:
+	WarnLight( Scene *scene, const vec3f& pos, const vec3f& color, const vec3f& dir, const vec3f& edgeplace, const vec3f& flap_0, const vec3f& flap_1)
+		: Light( scene, color ), position( pos ), direction(dir.normalize()), flap_0(flap_0), flap_1(flap_1), cutoff(cos(edgeplace[0] * 3.1415926535 / 180)) {}
+	virtual vec3f shadowAttenuation(const vec3f& P) const;
+	virtual double distanceAttenuation( const vec3f& P ) const;
+	virtual vec3f getColor( const vec3f& P ) const;
+	virtual vec3f getDirection( const vec3f& P ) const;
+
+	int shape; // 0 = rectangle, 1 = triangle, 2 = circle
+
+protected:
+	vec3f position;
+	vec3f direction;
+	vec3f flap_0;
+	vec3f flap_1;
 	double cutoff;
 };
 

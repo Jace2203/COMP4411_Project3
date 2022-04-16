@@ -582,7 +582,7 @@ inline bool operator !=( const mat3f& a, const mat3f& b )
 
 inline ostream& operator <<( ostream& os, const mat3f& m )
 {
-	os << m.v[0] << " " << m.v[1] << " " << m.v[2];
+	return os << m.v[0] << " " << m.v[1] << " " << m.v[2];
 }
 
 inline istream& operator >>( istream& is, mat3f& m )
@@ -653,7 +653,7 @@ inline bool operator !=( const mat4f& a, const mat4f& b )
 
 inline ostream& operator <<( ostream& os, const mat4f& m )
 {
-	os << m.v[0] << " " << m.v[1] << " " << m.v[2] << " " << m.v[3];
+	return os << m.v[0] << " " << m.v[1] << " " << m.v[2] << " " << m.v[3];
 }
 
 inline istream& operator >>( istream& is, mat4f& m )

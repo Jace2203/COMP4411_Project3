@@ -8,6 +8,7 @@
 #include "scene/ray.h"
 #include "fileio/read.h"
 #include "fileio/parse.h"
+#include "SceneObjects/trimesh.h"
 
 #include "ui/TraceUI.h"
 
@@ -21,42 +22,75 @@ extern TraceUI* traceUI;
 // in an initial ray weight of (0.0,0.0,0.0) and an initial recursion depth of 0.
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
-    ray r( vec3f(0,0,0), vec3f(0,0,0) );
-	vec3f result = vec3f(0,0,0);
-	if (traceUI->getSuperSamp())
-	{
-		int sampling_size = traceUI->getSupPixel();
-		double sub_size = 1 / sampling_size;
-		for (int j = 0; j < sampling_size + 1; j++)
-		{
-			for (int i = 0; i < sampling_size + 1; i++)
-			{
-				int offset_x = 0, offset_y = 0;
-				if (traceUI->getJitter())
-				{
-					offset_x = rand() % 21 - 11;
-					offset_y = rand() % 21 - 11;
-				}
+	ray r( vec3f(0,0,0), vec3f(0,0,0) );
+	scene->getCamera()->rayThrough( x,y,r );
 
-				double xx = x + (i * sub_size - 0.5 + (offset_x / 40.0))/buffer_width;
-				double yy = y + (j * sub_size - 0.5 + (offset_y / 40.0))/buffer_height;
-    			scene->getCamera()->rayThrough( xx,yy,r );
-				result += traceRay( scene, r, vec3f(1.0, 1.0, 1.0), traceUI->getDepth() );
+	if (!traceUI->getDOF() && !traceUI->getMotion())
+		return traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
+
+	vec3f res(0, 0, 0);
+
+	vec3f dir(r.getDirection().normalize());
+	vec3f u = dir.cross(vec3f(1, 0, 0));
+	if (u.iszero()) u = dir.cross(vec3f(0, 1, 0));
+	vec3f v = dir.cross(u);
+
+	vec3f eye(r.getPosition());
+
+	if (traceUI->getMotion())
+	{
+		int a = 10;
+
+		for(int i = 0; i < a; ++i)
+		{
+			srand(time(NULL) + i);
+			double offx = 0.5;
+			double offy = 0.5;		
+
+			if (i < a-1)
+			{
+				for(int y = 0; y < 4; ++y)
+					for(int x = 0; x < 4; ++x)
+					{
+						vec3f offset(vec3f(vec3f(offx * 0.1 + x, offy * 0.1 + y, 0) / 2 - vec3f(1, 1, 0)));
+						vec3f new_eye = eye + prod(offset, (u + v).normalize()) * 0.07 + (-u - v) * i * 0.7 / a;
+						r = ray( new_eye, dir );
+						res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
+					}
+			}
+			else
+			{
+				vec3f new_eye = eye + (-u - v) * i * 0.7 / a;
+				r = ray( eye, dir );
+				res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
 			}
 		}
-		result /= (sampling_size + 1) * (sampling_size + 1);
-		result = result.clamp();
+
+		return res / 16 / a;
 	}
-	else if (traceUI->getAdaptSupper())
+
+	if (traceUI->getDOF())
 	{
-		result = AdaptSampling(x, y, traceUI->getSupPixel()).clamp();
+		int a = 10;
+
+		vec3f focus_pt = eye + dir * traceUI->getFocalLength();
+
+		for(int i = 0; i < a; ++i)
+		{
+			srand(time(NULL) + i);
+
+			for(int y = 0; y < 4; ++y)
+				for(int x = 0; x < 4; ++x)
+				{
+					vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+					vec3f new_eye = eye + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * traceUI->getApertureSize() * 0.135;
+					r = ray( new_eye, (focus_pt - new_eye).normalize() );
+					res += traceRay( scene, r, vec3f(1.0,1.0,1.0) * traceUI->getThreshhold(), traceUI->getDepth() ).clamp();
+				}
+		}
+
+		return res / 16 / a;
 	}
-	else
-	{
-    	scene->getCamera()->rayThrough( x,y,r );
-		result += traceRay( scene, r, vec3f(1.0,1.0,1.0), traceUI->getDepth() ).clamp();
-	}
-	return result;
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -80,26 +114,58 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		const Material& m = i.getMaterial();
 
+		vec3f shade = prod( (vec3f(1, 1, 1) - m.kt), m.shade(scene, r, i) ).clamp();
+
 		if (!depth)
-			return m.shade(scene, r, i);
+			return shade;
 
 		vec3f refl(0, 0, 0);
 		vec3f refr(0, 0, 0);
 
-		if (!m.kr.iszero())
+		if (!m.kr.iszero() && m.kr.length() >= thresh.length())
 		{
 			vec3f reflect(ray::reflect(r.getDirection(), i.N).normalize());
-			refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), thresh, depth - 1);
+
+			vec3f new_thresh = thresh;
+			if (!thresh.iszero())
+			{
+				vec3f kr( (m.kr[0]) ? m.kr[0] : 1, (m.kr[1]) ? m.kr[1] : 1, (m.kr[2]) ? m.kr[2] : 1 );
+				new_thresh = prod( thresh, vec3f(1 / kr[0], 1/kr[1], 1/kr[2]) );
+			}
+
+			if (!traceUI->getGlossy())
+				refl = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * reflect, reflect), new_thresh, depth - 1).clamp();
+			else
+			{
+				vec3f u(reflect.cross(vec3f(1, 0, 0)).normalize());
+				if (u.iszero()) u = reflect.cross(vec3f(0, 1, 0)).normalize();
+				vec3f v(reflect.cross(u).normalize());
+
+				for(int y = 0; y < 4; ++y)
+					for(int x = 0; x < 4; ++x)
+					{
+						srand(time(NULL) + x + y);
+						vec3f offset(vec3f(rand() % 11 * 0.1 + x, rand() % 11 * 0.1 + y, 0) / 2);
+						vec3f new_reflect = reflect + prod(offset - vec3f(1, 1, 0), (u + v).normalize()) * 0.06;
+						refl += traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * new_reflect, new_reflect), new_thresh, depth - 1).clamp();
+					}
+				refl /= 16;
+			}
 		}
 
-		if (!m.kt.iszero())
+		if (!m.kt.iszero() && m.kt.length() >= thresh.length())
 		{
+			vec3f new_thresh = thresh;
+			if (!thresh.iszero())
+			{
+				vec3f kt( (m.kt[0]) ? m.kt[0] : 1, (m.kt[1]) ? m.kt[1] : 1, (m.kt[2]) ? m.kt[2] : 1 );
+				new_thresh = prod( thresh, vec3f(1 / kt[0], 1/kt[1], 1/kt[2]) );
+			}
 			vec3f refract(ray::refract(r.getDirection(), i.N, m.index).normalize());
-			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), thresh, depth - 1);
-		}
+			refr = traceRay(scene, ray(r.at(i.t) + RAY_EPSILON * refract, refract), new_thresh, depth - 1).clamp();
+		}	
 		
-		return m.shade(scene, r, i) + prod(m.kr, refl) + prod(m.kt, refr);
-	
+		return shade + prod(m.kr, refl) + prod(m.kt, refr);	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
@@ -120,7 +186,6 @@ RayTracer::RayTracer()
 	m_nNoiseSize = 0;
 	m_dNoiseTexture = nullptr;
 }
-
 
 RayTracer::~RayTracer()
 {
@@ -175,6 +240,37 @@ bool RayTracer::loadScene( char* fn )
 	m_bSceneLoaded = true;
 
 	return true;
+}
+
+void RayTracer::loadHField(unsigned char *data, unsigned char *grey, int width, int height)
+{
+	Material *mat = new Material();
+	mat->kd = vec3f(1, 0, 0);
+
+ 	Trimesh *tmesh = new Trimesh( scene, mat, &scene->transformRoot);
+	
+	for(int j = 0; j < height; ++j)
+		for(int i = 0; i < width; ++i)
+			tmesh->addVertex( vec3f( j, -(vec3f( grey[(i + j * width) * 3], grey[(i + j * width) * 3 + 1], grey[(i + j * width) * 3 + 2]) / 255).length() * width / 8, i) / width * 4);
+
+	for(int j = 0; j < height - 1; ++j)
+	{
+		for(int i = 0; i < width - 1; ++i)
+		{
+			tmesh->addFace(i + 1 + (j + 1) * width, i + (j + 1) * width, i + j * width);
+			tmesh->addFace(i + 1 + (j + 1) * width, i + j * width, i + 1 + j * width);
+		}
+	}
+
+	for(int j = 0; j < height; ++j)
+		for(int i = 0; i < width; ++i)
+		{
+			Material *mt = new Material();
+			mt->kd = vec3f(data[(i + j * width) * 3], data[(i + j * width) * 3 + 1], data[(i + j * width) * 3 + 2]) / 255;
+			tmesh->addMaterial( mt );
+		}
+
+	scene->initScene();
 }
 
 void RayTracer::traceSetup( int w, int h )
@@ -309,3 +405,4 @@ vec3f RayTracer::AdaptSampling(double x, double y, int depth, int a, int b, int 
 
 	return result;
 }
+

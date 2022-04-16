@@ -11,6 +11,7 @@
 
 #include "TraceUI.h"
 #include "../RayTracer.h"
+#include "../fileio/bitmap.h"
 
 static bool done;
 extern RayTracer* theRayTracer;
@@ -39,6 +40,33 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 		}
 
 		pUI->m_mainWindow->label(buf);
+	}
+}
+
+void TraceUI::cb_load_hfield(Fl_Menu_* o, void* v) 
+{
+	TraceUI* pUI=whoami(o);
+	
+	char* newfile = fl_file_chooser("Open Scene?", "*.bmp", NULL );
+
+	if (newfile != NULL) {
+		unsigned char*	data;
+		int				width,
+						height;
+
+		if ( (data=readBMP(newfile, width, height))==NULL )
+		{
+			fl_alert("Can't load bitmap file");
+		}
+
+		char* pch = strtok (newfile, ".");
+		unsigned char* grey;
+		if ( (grey=readBMP(strcat(pch, "_grey.bmp"), width, height))==NULL )
+		{
+			fl_alert("Can't load bitmap file");
+		}
+
+		pUI->raytracer->loadHField(data, grey, width, height);
 	}
 }
 
@@ -121,15 +149,29 @@ void TraceUI::cb_threshholdSlides(Fl_Widget* o, void* v)
 void TraceUI::cb_superSampButton(Fl_Widget* o, void* v)
 {
 	if (((TraceUI*)(o->user_data()))->m_bSuperSamp)
+	{
 		((TraceUI*)(o->user_data()))->m_bSuperSamp = false;
-	else ((TraceUI*)(o->user_data()))->m_bSuperSamp = true;
+		((TraceUI*)(o->user_data()))->m_AdaptSupperButton->activate();
+	}
+	else
+	{
+		((TraceUI*)(o->user_data()))->m_bSuperSamp = true;
+		((TraceUI*)(o->user_data()))->m_AdaptSupperButton->deactivate();
+	}
 }
 
 void TraceUI::cb_adaptSupperButton(Fl_Widget* o, void* v)
 {
 	if (((TraceUI*)(o->user_data()))->m_bAdaptSupper)
+	{
 		((TraceUI*)(o->user_data()))->m_bAdaptSupper = false;
-	else ((TraceUI*)(o->user_data()))->m_bAdaptSupper = true;
+		((TraceUI*)(o->user_data()))->m_SuperSampButton->activate();
+	}
+	else
+	{
+		((TraceUI*)(o->user_data()))->m_bAdaptSupper = true;
+		((TraceUI*)(o->user_data()))->m_SuperSampButton->deactivate();
+	}
 }
 
 void TraceUI::cb_jitterButton(Fl_Widget* o, void* v)
@@ -256,6 +298,8 @@ void TraceUI::cb_render(Fl_Widget* o, void* v)
 		Fl::check();
 		Fl::flush();
 
+		srand(time(NULL));
+
 		for (int y=0; y<height; y++) {
 			for (int x=0; x<width; x++) {
 				if (done) break;
@@ -298,6 +342,7 @@ void TraceUI::cb_render(Fl_Widget* o, void* v)
 			pUI->m_traceGlWindow->label(buffer);
 			
 		}
+		printf("finish");
 		done=true;
 		pUI->m_traceGlWindow->refresh();
 
@@ -337,6 +382,7 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
+		{ "&Load HField Map",	FL_ALT + 'h', (Fl_Callback *)TraceUI::cb_load_hfield },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 

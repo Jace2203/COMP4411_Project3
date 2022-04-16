@@ -47,9 +47,12 @@ bool Torus::intersectLocal( const ray& r, isect& i ) const
 
     i.obj = this;
     vec3f p = r.at(t);
-    vec3f normal = vec3f(4.0 * p[0] * p.length_squared() - sigma,
-                         4.0 * p[1] * p.length_squared() - sigma,
-                         4.0 * p[2] * p.length_squared() - sigma + 8 * m_R * m_R * p[2]);
+    double alpha = m_R / sqrt(p[0] * p[0] + p[2] * p[2]);
+    vec3f normal = p - vec3f(p[0], 0.0, p[2]) * alpha;
+
+    // vec3f normal = vec3f(4.0 * p[0] * p.length_squared() - sigma,
+    //                      4.0 * p[1] * p.length_squared() - sigma,
+    //                      4.0 * p[2] * p.length_squared() - sigma + 8 * m_R * m_R * p[2]);
 
     i.N = normal.normalize();
 
